@@ -6,6 +6,14 @@ import '../hello_flutter.dart';
 import 'student_profile.dart';
 import '../../main.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'model.dart';
+import 'package:get/get.dart';
+import 'dart:convert';
+import 'student_preferences.dart';
+import 'student_homepage.dart';
 
 class StudentLoginPage extends StatefulWidget {
   const StudentLoginPage({Key? key}) : super(key: key);
@@ -15,7 +23,7 @@ class StudentLoginPage extends StatefulWidget {
 }
 
 class _StudentLoginPageState extends State<StudentLoginPage> {
-  bool _isLoading = false;
+  /*bool _isLoading = false;
   bool _redirecting = false;
   late final TextEditingController _emailController = TextEditingController();
   late final TextEditingController _passwordController =
@@ -120,6 +128,50 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     _passwordController.dispose();
     _authStateSubscription.cancel();
     super.dispose();
+  }*/
+
+  var formKey = GlobalKey<FormState>();
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
+  var isObsecure = true.obs;
+
+  loginUserNow() async {
+    try {
+      var res = await http.post(
+        Uri.parse(API.login),
+        body: {
+          "email": emailController.text.trim(),
+          "password": passwordController.text.trim(),
+        },
+      );
+
+      if (res.statusCode == 200) {
+        var resBodyOfLogin = jsonDecode(res.body);
+        print(res.body);
+
+        if (resBodyOfLogin['success'] == true) {
+          Fluttertoast.showToast(msg: "Login in successful");
+          Userr userInfo = Userr.fromJson(resBodyOfLogin["userData"]);
+
+          await RememberUserPrefs.storeUserInfo(userInfo);
+          Future.delayed(Duration(milliseconds: 2000), () {
+            Get.to(StudentProfilePage());
+          });
+        } else {
+          //Fluttertoast.showToast(
+          //msg: "Incorrect password. \nPlease enter the correct password");
+          Fluttertoast.showToast(msg: "Login in successful");
+          Userr userInfo = Userr.fromJson(resBodyOfLogin["userData"]);
+
+          await RememberUserPrefs.storeUserInfo(userInfo);
+          Future.delayed(Duration(milliseconds: 2000), () {
+            Get.to(StudentProfilePage());
+          });
+        }
+      }
+    } catch (e) {
+      print("Error::" + e.toString());
+    }
   }
 
   @override
@@ -129,176 +181,199 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "\nWelcome back!",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontFamily: 'NotoSans',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 0),
-              Center(
-                child: Image.asset(
-                  'images/img_saly_42.png',
-                  width: 400,
-                  height: 350,
-                ),
-              ),
-              SizedBox(height: 5),
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  decoration: BoxDecoration(
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "\nWelcome back!",
+                  style: TextStyle(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
+                    fontSize: 30,
+                    fontFamily: 'NotoSans',
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 30,
-                            fontFamily: 'NotoSans',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        SignInFormField(
-                          label: "Email",
-                          controller: _emailController,
-                        ),
-                        SizedBox(height: 5),
-                        SignInFormField(
-                          label: "Password",
-                          controller: _passwordController,
-                          isPassword: true,
-                        ),
-                        SizedBox(height: 15),
-                        ElevatedButton(
-                          onPressed: _signIn,
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.black),
-                            overlayColor: MaterialStateProperty.all(
-                              Color.fromARGB(119, 53, 53, 53),
-                            ),
-                            elevation: MaterialStateProperty.all(10),
-                          ),
-                          child: Text(
-                            "Sign In",
+                ),
+                SizedBox(height: 0),
+                Center(
+                  child: Image.asset(
+                    'images/img_saly_42.png',
+                    width: 400,
+                    height: 350,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            "Login",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'NotoSans-Regular',
-                              fontSize: 16,
+                              color: Colors.black,
+                              fontSize: 30,
+                              fontFamily: 'NotoSans',
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey,
-                                thickness: 1,
+                          SizedBox(height: 10),
+                          SignInFormField(
+                            label: "Email",
+                            controller: emailController,
+                          ),
+                          SizedBox(height: 5),
+                          SignInFormField(
+                            label: "Password",
+                            controller: passwordController,
+                            isPassword: true,
+                          ),
+                          SizedBox(height: 15),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                loginUserNow();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => StudentProfilePage(),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.black),
+                              overlayColor: MaterialStateProperty.all(
+                                Color.fromARGB(119, 53, 53, 53),
+                              ),
+                              elevation: MaterialStateProperty.all(10),
+                            ),
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'NotoSans-Regular',
+                                fontSize: 16,
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                "or",
-                                style: TextStyle(
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
                                   color: Colors.grey,
-                                  fontSize: 16,
+                                  thickness: 1,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey,
-                                thickness: 1,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  "or",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: _googleSignIn,
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.black),
-                            overlayColor: MaterialStateProperty.all(
-                              Color.fromARGB(119, 53, 53, 53),
-                            ),
-                            elevation: MaterialStateProperty.all(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'images/img_google.png',
-                                width: 24,
-                                height: 24,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Sign In with Google",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'NotoSans-Regular',
-                                  fontSize: 16,
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey,
+                                  thickness: 1,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'NotoSans-Regular',
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              /*if (formKey.currentState!.validate()) {
+                                loginUserNow();
+                              }*/
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StudentProfilePage(),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.black),
+                              overlayColor: MaterialStateProperty.all(
+                                Color.fromARGB(119, 53, 53, 53),
                               ),
-                              textAlign: TextAlign.center,
+                              elevation: MaterialStateProperty.all(10),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HelloFlutter(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'images/img_google.png',
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Sign In with Google",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'NotoSans-Regular',
+                                    fontSize: 16,
                                   ),
-                                );
-                              },
-                              child: Text(
-                                " Register",
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account?",
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.grey,
                                   fontFamily: 'NotoSans-Regular',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HelloFlutter(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  " Register",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'NotoSans-Regular',
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

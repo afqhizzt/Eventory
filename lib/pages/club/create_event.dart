@@ -6,6 +6,9 @@ import 'dart:convert';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../form_fields.dart';
 import 'wait_approval.dart';
+import '../../api_connection/api_connection.dart';
+import 'package:http/http.dart' as http;
+import 'post_events.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -25,6 +28,30 @@ class CreateEventPage extends StatelessWidget {
   String? selectedLevel;
   String? selectedOrganizerCategory;
   String? selectedOrganizerLevel;
+
+  Future<void> sendDataToServer(Map<String, dynamic> eventData) async {
+    final Uri url = Uri.parse(API.events);
+    final http.Response response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(eventData),
+    );
+
+    print('API Response: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        print('Event created successfully!');
+      } else {
+        print('Error inserting data: ${data['message']}');
+      }
+    } else {
+      print('Failed to load data, status code: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -286,9 +313,9 @@ class CreateEventPage extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                List<int> fileBytes =
-                                    await selectedFile!.readAsBytes();
-                                String fileData = base64Encode(fileBytes);
+                                //List<int> fileBytes =
+                                //await selectedFile!.readAsBytes();
+                                //String fileData = base64Encode(fileBytes);
 
                                 Map<String, dynamic> eventData = {
                                   'category': selectedCategory,
@@ -309,29 +336,20 @@ class CreateEventPage extends StatelessWidget {
 
                                 // Print the eventData for debugging
                                 print('Event Data: $eventData');
+                                print('Before sendDataToServer');
+                                await sendDataToServer(eventData);
+                                print('After sendDataToServer');
 
-                                final response = await supabase
-                                    .from('events')
-                                    .upsert([eventData]).execute();
+                                print('Before Navigator.push');
 
-                                // Print the response for debugging
-                                print('Response: $response');
-
-                                if (response != null &&
-                                        response.status == 201 ||
-                                    response.status == 200) {
-                                  print('Event created successfully!');
-                                  // Navigate to WaitApprovalPage
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => WaitApprovalPage(),
-                                    ),
-                                  );
-                                } else {
-                                  print(
-                                      'Error inserting data: ${response.data}');
-                                }
+                                // Navigate to WaitApprovalPage
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WaitApprovalPage(),
+                                  ),
+                                );
+                                print('After Navigator.push');
                               }
                             },
                             style: ButtonStyle(

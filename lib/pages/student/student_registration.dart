@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../form_fields.dart';
 import 'student_login.dart';
 import 'package:supabase/supabase.dart';
 import '../../main.dart';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'model.dart';
 
 class UserRegistration extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -13,6 +19,69 @@ class UserRegistration extends StatelessWidget {
   final TextEditingController _matricNoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  validateUserEmail() async {
+    try {
+      var res = await http.post(
+        Uri.parse(API.validateEmail),
+        body: {
+          'email': _emailController.text.trim(),
+        },
+      );
+      print('Response Body: ${res.body}');
+      if (res.statusCode == 200) {
+        var resBodyOfValidateEmail = jsonDecode(res.body);
+
+        if (resBodyOfValidateEmail['emailFound']) {
+          Fluttertoast.showToast(msg: "Email is already someone else use");
+        } else {
+          //save new user records to database
+          registerAndSaveUserRecord();
+        }
+      }
+      ;
+      print('Response Body: ${res.body}');
+    } catch (e) {
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  registerAndSaveUserRecord() async {
+    Userr userModel = Userr(
+      1,
+      _nameController.text.trim(),
+      _usernameController.text.trim(),
+      _emailController.text.trim(),
+      _matricNoController.text.trim(),
+      _passwordController.text.trim(),
+    );
+    print("Name: ${_nameController.text}");
+    print("Username: ${_usernameController.text}");
+    print("Email: ${_emailController.text}");
+    print("Matric No: ${_matricNoController.text}");
+    print("Password: ${_passwordController.text}");
+
+    try {
+      var res = await http.post(
+        Uri.parse(API.signUp),
+        body: userModel.toJson(),
+      );
+
+      if (res.statusCode == 200) {
+        var resBodyOfSignUp = jsonDecode(res.body);
+
+        if (resBodyOfSignUp['success'] == true) {
+          Fluttertoast.showToast(msg: "Sign up successfully");
+        } else {
+          Fluttertoast.showToast(msg: "Error occured. Try again");
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +198,12 @@ class UserRegistration extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              await validateUserEmail();
                               // If the form is valid, perform submission.
                               // Handle submit logic here
 
                               // Example of accessing form field values
-                              String name = _nameController.text;
+                              /*String name = _nameController.text;
                               String username = _usernameController.text;
                               String matricNo = _matricNoController.text;
                               String email = _emailController.text;
@@ -172,6 +242,13 @@ class UserRegistration extends StatelessWidget {
                                 // Handle error, e.g., display an error message
                                 print('Error inserting data: ${response.data}');
                               }
+                            }*/
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StudentLoginPage(),
+                                ),
+                              );
                             }
                           },
                           style: ButtonStyle(

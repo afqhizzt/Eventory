@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'rules_regulations.dart';
 import 'search.dart';
 import 'club_profile.dart';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
+import 'dart:convert';
+import 'post_events.dart';
 
 class Post {
   final String username;
@@ -13,27 +17,42 @@ class Post {
     required this.imageUrl,
     required this.caption,
   });
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      username: json['username'],
+      imageUrl: json['imageUrl'], // Adjust the base URL
+      caption: json['caption'],
+    );
+  }
 }
 
-class HomePage extends StatelessWidget {
-  final List<Post> posts = [
-    Post(
-      username: 'PERSAKA',
-      imageUrl: 'images/post1.jpg',
-      caption: 'Caption for post 1',
-    ),
-    Post(
-      username: 'PERSAKA',
-      imageUrl: 'images/post2.jpg',
-      caption: 'Caption for post 2',
-    ),
-    Post(
-      username: 'PERSAKA',
-      imageUrl: 'images/post3.jpg',
-      caption: 'Caption for post 3',
-    ),
-    // Add more posts as needed
-  ];
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Post> posts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPosts();
+  }
+
+  Future<void> fetchPosts() async {
+    final response = await http.get(Uri.parse(API.post));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        posts = data.map((item) => Post.fromJson(item)).toList();
+      });
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +67,19 @@ class HomePage extends StatelessWidget {
         ),
         centerTitle: true,
         backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add_circle),
+            color: Colors.white,
+            onPressed: () {
+              // Navigate to the page for creating a new post
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NewPostPage()),
+              );
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.black,
       body: ListView.builder(
@@ -58,7 +90,7 @@ class HomePage extends StatelessWidget {
       ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
-          canvasColor: Colors.white, // Set the background color here
+          canvasColor: Colors.white,
         ),
         child: BottomNavigationBar(
           showSelectedLabels: true,
@@ -138,8 +170,8 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          Image(
-            image: AssetImage(post.imageUrl),
+          Image.network(
+            post.imageUrl,
             fit: BoxFit.cover,
             width: double.infinity,
             height: 400.00,
