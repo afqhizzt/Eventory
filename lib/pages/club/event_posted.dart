@@ -14,7 +14,7 @@ class EventPostedPage extends StatelessWidget {
             height: 350,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('images/img_time.png'),
+                image: AssetImage('images/img_done.png'),
                 fit: BoxFit.contain,
               ),
             ),

@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'dart:ui';
-import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../form_fields.dart';
 import 'wait_approval.dart';
 import '../../api_connection/api_connection.dart';
-import 'package:http/http.dart' as http;
 import 'post_events.dart';
 
 final supabase = Supabase.instance.client;
 
 class CreateEventPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  File? selectedFile;
+  //File? selectedFile;
 
   TextEditingController activityNameController = TextEditingController();
+  TextEditingController directorNameController = TextEditingController();
   TextEditingController venueController = TextEditingController();
   TextEditingController startDateController = TextEditingController();
   TextEditingController endDateController = TextEditingController();
   TextEditingController maxParticipantsController = TextEditingController();
   TextEditingController organizerNameController = TextEditingController();
+  TextEditingController imageUrlController = TextEditingController();
 
   String? selectedCategory;
   String? selectedType;
@@ -164,6 +164,17 @@ class CreateEventPage extends StatelessWidget {
                                 ),
                                 SizedBox(height: 15),
                                 SignUpFormField(
+                                  label: "Director Name",
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter director name';
+                                    }
+                                    return null;
+                                  },
+                                  controller: directorNameController,
+                                ),
+                                SizedBox(height: 15),
+                                SignUpFormField(
                                   label: "Venue",
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -252,58 +263,17 @@ class CreateEventPage extends StatelessWidget {
                                   },
                                 ),
                                 SizedBox(height: 15),
-                                // File Upload Field
-                                /*ElevatedButton(
-                                  onPressed: () async {
-                                    FilePickerResult? result =
-                                        await FilePicker.platform.pickFiles(
-                                      type: FileType.custom,
-                                      allowedExtensions: ['pdf'],
-                                    );
-
-                                    if (result != null) {
-                                      selectedFile =
-                                          File(result.files.single.path!);
+                                SignUpFormField(
+                                  label: "Activity Poster",
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter poster activity URL';
                                     }
+                                    return null;
                                   },
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                      Colors.grey[200],
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: 8.0,
-                                        ),
-                                        child: Image.asset(
-                                          'images/img_upload.png',
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                      ),
-                                      Text(
-                                        "         Click to upload your proposal",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: 'NotoSans',
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  controller: imageUrlController,
                                 ),
                                 SizedBox(height: 15),
-
-                                if (selectedFile != null)
-                                  Text(
-                                    "Selected File: ${selectedFile!.path}",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                    ),
-                                  ),*/
                               ],
                             ),
                           ),
@@ -313,15 +283,18 @@ class CreateEventPage extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                //List<int> fileBytes =
-                                //await selectedFile!.readAsBytes();
-                                //String fileData = base64Encode(fileBytes);
+                                // Extract text values from controllers
+                                String directorName =
+                                    directorNameController.text;
+                                String imageUrl = imageUrlController.text;
 
+                                // Create the eventData map
                                 Map<String, dynamic> eventData = {
                                   'category': selectedCategory,
                                   'type': selectedType,
                                   'level': selectedLevel,
                                   'activityName': activityNameController.text,
+                                  'director': directorName,
                                   'venue': venueController.text,
                                   'startDate': startDateController.text,
                                   'endDate': endDateController.text,
@@ -331,25 +304,20 @@ class CreateEventPage extends StatelessWidget {
                                   'organizerCategory':
                                       selectedOrganizerCategory,
                                   'organizerLevel': selectedOrganizerLevel,
-                                  //'fileData': fileData,
+                                  'imageUrl': imageUrl,
                                 };
 
-                                // Print the eventData for debugging
                                 print('Event Data: $eventData');
                                 print('Before sendDataToServer');
                                 await sendDataToServer(eventData);
                                 print('After sendDataToServer');
 
-                                print('Before Navigator.push');
-
-                                // Navigate to WaitApprovalPage
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => WaitApprovalPage(),
                                   ),
                                 );
-                                print('After Navigator.push');
                               }
                             },
                             style: ButtonStyle(
