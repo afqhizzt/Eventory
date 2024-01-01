@@ -1,10 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../form_fields.dart';
 import 'student_login.dart';
-import 'package:supabase/supabase.dart';
-import '../../main.dart';
 import 'package:http/http.dart' as http;
 import '../../api_connection/api_connection.dart';
 import 'package:fluttertoast/fluttertoast.dart';

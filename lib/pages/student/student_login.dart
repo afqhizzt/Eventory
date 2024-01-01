@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../form_fields.dart';
 import '../hello_flutter.dart';
-import 'student_profile.dart';
-import '../../main.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import '../../api_connection/api_connection.dart';
@@ -155,7 +152,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(StudentProfilePage());
+            Get.to(HomePage());
           });
         } else {
           //Fluttertoast.showToast(
@@ -165,7 +162,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(StudentProfilePage());
+            Get.to(HomePage());
           });
         }
       }
@@ -244,7 +241,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => StudentProfilePage(),
+                                    builder: (context) => HomePage(),
                                   ),
                                 );
                               }
@@ -303,7 +300,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => StudentProfilePage(),
+                                  builder: (context) => HomePage(),
                                 ),
                               );
                             },

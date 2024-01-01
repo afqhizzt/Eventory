@@ -2,11 +2,21 @@ class API {
   static const hostConnect = "http://192.168.56.1/api_eventory";
   static const hostConnectStudents = "$hostConnect/students";
 
-  //sigup student
+  //student
   static const signUp = "$hostConnect/students/signup.php";
   static const validateEmail = "$hostConnect/students/validate_email.php";
   static const login = "$hostConnect/students/login.php";
   static const post = "$hostConnect/students/post.php";
+
+  //club
+  static const signUpClub = "$hostConnect/clubs/signup.php";
+  static const validateEmailClub = "$hostConnect/clubs/validate_email.php";
+  static const loginClub = "$hostConnect/clubs/login.php";
   static const events = "$hostConnect/clubs/events.php";
   static const createPost = "$hostConnect/clubs/create_post.php";
+
+  //HEP
+  static const signUpHEP = "$hostConnect/hep/signup.php";
+  static const validateEmailHEP = "$hostConnect/hep/validate_email.php";
+  static const loginHEP = "$hostConnect/hep/login.php";
 }

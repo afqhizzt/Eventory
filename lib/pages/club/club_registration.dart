@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../form_fields.dart';
 import 'club_login.dart';
-import 'package:supabase/supabase.dart';
-import '../../main.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'model.dart';
 
 class ClubRegistration extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -13,6 +16,69 @@ class ClubRegistration extends StatelessWidget {
   final TextEditingController _clubNoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  validateUserEmail() async {
+    try {
+      var res = await http.post(
+        Uri.parse(API.validateEmailClub),
+        body: {
+          'email': _emailController.text.trim(),
+        },
+      );
+      print('Response Body: ${res.body}');
+      if (res.statusCode == 200) {
+        var resBodyOfValidateEmail = jsonDecode(res.body);
+
+        if (resBodyOfValidateEmail['emailFound']) {
+          Fluttertoast.showToast(msg: "Email is already someone else use");
+        } else {
+          //save new user records to database
+          registerAndSaveUserRecord();
+        }
+      }
+      ;
+      print('Response Body: ${res.body}');
+    } catch (e) {
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  registerAndSaveUserRecord() async {
+    Userr userModel = Userr(
+      1,
+      _nameController.text.trim(),
+      _usernameController.text.trim(),
+      _emailController.text.trim(),
+      _clubNoController.text.trim(),
+      _passwordController.text.trim(),
+    );
+    print("Name: ${_nameController.text}");
+    print("Username: ${_usernameController.text}");
+    print("Email: ${_emailController.text}");
+    print("Matric No: ${_clubNoController.text}");
+    print("Password: ${_passwordController.text}");
+
+    try {
+      var res = await http.post(
+        Uri.parse(API.signUpClub),
+        body: userModel.toJson(),
+      );
+
+      if (res.statusCode == 200) {
+        var resBodyOfSignUp = jsonDecode(res.body);
+
+        if (resBodyOfSignUp['success'] == true) {
+          Fluttertoast.showToast(msg: "Sign up successfully");
+        } else {
+          Fluttertoast.showToast(msg: "Error occured. Try again");
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +132,10 @@ class ClubRegistration extends StatelessWidget {
                         ),
                         SizedBox(height: 15),
                         SignUpFormField(
-                          label: "Name",
+                          label: "Club Name",
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
+                              return 'Please enter your club name';
                             }
                             return null;
                           },
@@ -77,7 +143,7 @@ class ClubRegistration extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         SignUpFormField(
-                          label: "Username",
+                          label: "Club Username",
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a username';
@@ -103,7 +169,7 @@ class ClubRegistration extends StatelessWidget {
                           isEmail: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return 'Please enter your club email';
                             } else if (!value.contains('@')) {
                               return 'Invalid email address';
                             }
@@ -129,24 +195,25 @@ class ClubRegistration extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              await validateUserEmail();
                               // If the form is valid, perform submission.
                               // Handle submit logic here
 
                               // Example of accessing form field values
-                              String name = _nameController.text;
+                              /*String name = _nameController.text;
                               String username = _usernameController.text;
-                              String clubNo = _clubNoController.text;
+                              String matricNo = _matricNoController.text;
                               String email = _emailController.text;
                               String password = _passwordController.text;
 
                               // Save data to Supabase
                               final response = await supabase
-                                  .from('club_registration')
+                                  .from('student_registration')
                                   .upsert([
                                 {
                                   'name': name,
                                   'username': username,
-                                  'clubNo': clubNo,
+                                  'matricNo': matricNo,
                                   'email': email,
                                   'password': password,
                                 }
@@ -165,13 +232,20 @@ class ClubRegistration extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ClubLoginPage(),
+                                    builder: (context) => StudentLoginPage(),
                                   ),
                                 );
                               } else {
                                 // Handle error, e.g., display an error message
                                 print('Error inserting data: ${response.data}');
                               }
+                            }*/
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ClubLoginPage(),
+                                ),
+                              );
                             }
                           },
                           style: ButtonStyle(

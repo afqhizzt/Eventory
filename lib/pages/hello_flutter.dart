@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
 
 class HelloFlutter extends StatefulWidget {
   const HelloFlutter({super.key});
@@ -9,22 +8,6 @@ class HelloFlutter extends StatefulWidget {
 }
 
 class _HelloFlutterState extends State<HelloFlutter> {
-  @override
-  void initState() {
-    super.initState();
-    _redirect();
-  }
-
-  Future<void> _redirect() async {
-    await Future.delayed(Duration.zero);
-    if (!mounted) {
-      return;
-    }
-
-    final session = supabase.auth.currentSession;
-    if (session != null) {}
-  }
-
   Color studentButtonColor = Colors.black;
   Color studentTextColor = Colors.white;
 
@@ -98,7 +81,7 @@ class _HelloFlutterState extends State<HelloFlutter> {
                     height: 50,
                   ),
                   Text(
-                    "Choose you role:",
+                    "Choose your role:",
                     style: TextStyle(
                       color: Color.fromARGB(225, 0, 0, 0),
                       fontSize: 17,
@@ -177,7 +160,7 @@ class _HelloFlutterState extends State<HelloFlutter> {
                               hepButtonColor = Colors.white;
                               hepTextColor = Colors.black;
                             });
-                            Navigator.pushNamed(context, '/ClubRegistration');
+                            Navigator.pushNamed(context, '/UserRegistration');
                           },
                         ),
                       ),
@@ -210,9 +193,9 @@ class _HelloFlutterState extends State<HelloFlutter> {
                               clubButtonColor = Colors.white;
                               clubTextColor = Colors.black;
                               hepButtonColor = Colors.black;
-                              hepTextColor = Colors.white;
+                              hepTextColor = Colors.black;
                             });
-                            Navigator.pushNamed(context, '/HEPRegistration');
+                            Navigator.pushNamed(context, '/UserRegistration');
                           },
                         ),
                       ),
