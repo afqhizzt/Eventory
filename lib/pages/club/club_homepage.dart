@@ -27,12 +27,12 @@ class Post {
   }
 }
 
-class HomePage extends StatefulWidget {
+class ClubHomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<ClubHomePage> {
   List<Post> posts = [];
 
   @override
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
             } else if (index == 0) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => ClubHomePage()),
               );
             } else if (index == 1) {
               Navigator.push(

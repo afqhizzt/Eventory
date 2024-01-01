@@ -243,7 +243,7 @@ class ClubProfilePage extends StatelessWidget {
             } else if (index == 0) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => ClubHomePage()),
               );
             } else if (index == 1) {
               Navigator.push(

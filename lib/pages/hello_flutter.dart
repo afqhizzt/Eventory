@@ -160,7 +160,7 @@ class _HelloFlutterState extends State<HelloFlutter> {
                               hepButtonColor = Colors.white;
                               hepTextColor = Colors.black;
                             });
-                            Navigator.pushNamed(context, '/UserRegistration');
+                            Navigator.pushNamed(context, '/ClubRegistration');
                           },
                         ),
                       ),
@@ -195,7 +195,7 @@ class _HelloFlutterState extends State<HelloFlutter> {
                               hepButtonColor = Colors.black;
                               hepTextColor = Colors.black;
                             });
-                            Navigator.pushNamed(context, '/UserRegistration');
+                            Navigator.pushNamed(context, '/HEPRegistration');
                           },
                         ),
                       ),

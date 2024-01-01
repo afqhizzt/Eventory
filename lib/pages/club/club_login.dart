@@ -152,7 +152,7 @@ class _ClubLoginPageState extends State<ClubLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(HomePage());
+            Get.to(ClubHomePage());
           });
         } else {
           //Fluttertoast.showToast(
@@ -162,7 +162,7 @@ class _ClubLoginPageState extends State<ClubLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(HomePage());
+            Get.to(ClubHomePage());
           });
         }
       }
@@ -241,7 +241,7 @@ class _ClubLoginPageState extends State<ClubLoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) => ClubHomePage(),
                                   ),
                                 );
                               }
@@ -300,7 +300,7 @@ class _ClubLoginPageState extends State<ClubLoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HomePage(),
+                                  builder: (context) => ClubHomePage(),
                                 ),
                               );
                             },
