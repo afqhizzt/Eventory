@@ -13,7 +13,7 @@ class JoinEventPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 150), // Adjusted height
+              SizedBox(height: 5), // Adjusted height
               Expanded(
                 child: Container(
                   width: double.infinity,

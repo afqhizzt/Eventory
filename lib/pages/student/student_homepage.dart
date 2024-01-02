@@ -6,6 +6,7 @@ import 'search.dart';
 import 'student_profile.dart';
 import 'reminder.dart';
 import '../../api_connection/api_connection.dart';
+import 'joint_event.dart';
 
 class Post {
   final String username;
@@ -149,16 +150,37 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CircleAvatar(
-                  radius: 20.0,
-                  backgroundImage: AssetImage(
-                    'images/persaka.jpg',
-                  ),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20.0,
+                      backgroundImage: AssetImage(
+                        'images/persaka.jpg',
+                      ),
+                    ),
+                    SizedBox(width: 8.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(post.username,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4.0),
+                      ],
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8.0),
-                Text(post.username,
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                TextButton(
+                  onPressed: () {
+                    showRegistrationForm(context);
+                  },
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all<BorderSide>(
+                        BorderSide(color: Colors.blue)),
+                  ),
+                  child: Text('Register', style: TextStyle(color: Colors.blue)),
+                ),
               ],
             ),
           ),
@@ -176,4 +198,18 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+void showRegistrationForm(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: Container(
+          width: double.infinity,
+          child: JoinEventPage(), // Use your registration form widget here
+        ),
+      );
+    },
+  );
 }
