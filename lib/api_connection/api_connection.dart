@@ -14,6 +14,7 @@ class API {
   static const loginClub = "$hostConnect/clubs/login.php";
   static const events = "$hostConnect/clubs/events.php";
   static const createPost = "$hostConnect/clubs/create_post.php";
+  static const eventDetail = "$hostConnect/clubs/event_details.php";
 
   //HEP
   static const signUpHEP = "$hostConnect/hep/signup.php";

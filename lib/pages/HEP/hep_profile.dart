@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'hep_event_details.dart';
 import 'hep_edit_page.dart';
-import 'hep_homepage.dart';
-import 'hep_search.dart';
+import 'EventStatus.dart';
 
 class HEPProfilePage extends StatelessWidget {
   @override
@@ -232,7 +231,7 @@ class HEPProfilePage extends StatelessWidget {
           unselectedItemColor: Colors.black,
           selectedItemColor: Colors.black,
           onTap: (index) {
-            if (index == 2) {
+            if (index == 1) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => EventDetailsPage()),
@@ -240,14 +239,9 @@ class HEPProfilePage extends StatelessWidget {
             } else if (index == 0) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => EventListPage()),
               );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
-              );
-            } else if (index == 4) {
+            } else if (index == 2) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => HEPProfilePage()),
@@ -257,19 +251,11 @@ class HEPProfilePage extends StatelessWidget {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.center_focus_strong),
               label: 'Status',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'Notification',
+              icon: Icon(Icons.center_focus_strong),
+              label: 'Summary',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

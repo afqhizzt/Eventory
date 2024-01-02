@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'rules_regulations.dart';
-import 'search.dart';
 import 'club_profile.dart';
 import 'package:http/http.dart' as http;
 import '../../api_connection/api_connection.dart';
 import 'dart:convert';
 import 'post_events.dart';
+import 'event_details.dart';
 
 class Post {
   final String username;
@@ -95,11 +95,11 @@ class _HomePageState extends State<ClubHomePage> {
         child: BottomNavigationBar(
           showSelectedLabels: true,
           showUnselectedLabels: true,
-          unselectedItemColor: Colors.black,
+          unselectedItemColor: const Color.fromARGB(255, 40, 40, 40),
           selectedItemColor: Colors.black,
           backgroundColor: Colors.white,
           onTap: (index) {
-            if (index == 2) {
+            if (index == 1) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => RulesReguPage()),
@@ -109,12 +109,12 @@ class _HomePageState extends State<ClubHomePage> {
                 context,
                 MaterialPageRoute(builder: (context) => ClubHomePage()),
               );
-            } else if (index == 1) {
+            } else if (index == 2) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
+                MaterialPageRoute(builder: (context) => EventPage()),
               );
-            } else if (index == 4) {
+            } else if (index == 3) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ClubProfilePage()),
@@ -127,16 +127,12 @@ class _HomePageState extends State<ClubHomePage> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.add),
               label: 'Create',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'Notification',
+              icon: Icon(Icons.today),
+              label: 'Event',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

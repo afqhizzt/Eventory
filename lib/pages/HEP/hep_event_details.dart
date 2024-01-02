@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'hep_homepage.dart';
-import 'hep_search.dart';
 import 'hep_profile.dart';
+import 'EventStatus.dart';
 
 class EventDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Number of tabs
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Event Status'),
@@ -18,7 +17,7 @@ class EventDetailsPage extends StatelessWidget {
               Tab(text: 'Non Approved Events'),
               Tab(text: 'Past Events'),
             ],
-            indicatorColor: Colors.black, // Set the indicator color
+            indicatorColor: Colors.black,
           ),
         ),
         body: TabBarView(
@@ -85,69 +84,43 @@ class EventDetailsPage extends StatelessWidget {
                 )),
           ],
         ),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.white,
-          ),
-          child: BottomNavigationBar(
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            unselectedItemColor: Colors.black,
-            selectedItemColor: Colors.black,
-            backgroundColor:
-                Colors.white, // Set navigation background color to white
-            onTap: (index) {
-              if (index == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-              } else if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SearchScreen()),
-                );
-              } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EventDetailsPage()),
-                );
-              } else if (index == 3) {
-                // Handle 'Notification' action
-                // You can implement the logic here
-                print('Tapped on Notification');
-              } else if (index == 4) {
-                // Handle 'Profile' action
-                // You can implement the logic here
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HEPProfilePage()),
-                );
-              }
-            },
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: 'Search',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.center_focus_strong),
-                label: 'Status',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.notifications),
-                label: 'Notification',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-          ),
+        bottomNavigationBar: BottomNavigationBar(
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          unselectedItemColor: Colors.black,
+          selectedItemColor: Colors.black,
+          onTap: (index) {
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EventDetailsPage()),
+              );
+            } else if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EventListPage()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HEPProfilePage()),
+              );
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Status',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.center_focus_strong),
+              label: 'Summary',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
         ),
       ),
     );

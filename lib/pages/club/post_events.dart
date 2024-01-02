@@ -16,6 +16,30 @@ class _NewPostPageState extends State<NewPostPage> {
   TextEditingController imageUrl = TextEditingController();
   TextEditingController caption = TextEditingController();
   String? selectedEvent;
+  List<Map<String, dynamic>> eventsData =
+      []; // List to store fetched events data
+
+  @override
+  void initState() {
+    super.initState();
+    fetchApprovedEvents(); // Fetch approved events data when the widget is initialized
+    // Set default value for username
+    username.text = 'persaka';
+  }
+
+  Future<void> fetchApprovedEvents() async {
+    final Uri url = Uri.parse(API.createPost);
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the data
+      eventsData = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      // If the server did not return a 200 OK response, throw an exception
+      throw Exception('Failed to load events');
+    }
+  }
 
   Future<void> sendDataToServer() async {
     final Uri url = Uri.parse(API.createPost);
@@ -68,15 +92,13 @@ class _NewPostPageState extends State<NewPostPage> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    DropdownButtonFormField(
-                      items: [
-                        DropdownMenuItem(
-                            value: 'Event 1', child: Text('Event 1')),
-                        DropdownMenuItem(
-                            value: 'Event 2', child: Text('Event 2')),
-                        DropdownMenuItem(
-                            value: 'Event 3', child: Text('Event 3')),
-                      ],
+                    DropdownButtonFormField<String>(
+                      items: eventsData.map((event) {
+                        return DropdownMenuItem<String>(
+                          value: event['activityName'],
+                          child: Text(event['activityName']),
+                        );
+                      }).toList(),
                       onChanged: (String? value) {
                         setState(() {
                           selectedEvent = value;
@@ -139,7 +161,6 @@ class _NewPostPageState extends State<NewPostPage> {
                                   builder: (context) => EventPostedPage(),
                                 ),
                               );
-
                               // Handle navigation or display success message
                             }
                           },
