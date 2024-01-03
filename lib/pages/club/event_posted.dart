@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'club_profile.dart';
+import 'package:tryyy/pages/club/club_homepage.dart';
 
 class EventPostedPage extends StatelessWidget {
   @override
@@ -81,7 +81,7 @@ class EventPostedPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ClubProfilePage(),
+                            builder: (context) => ClubHomePage(),
                           ),
                         );
                       },
