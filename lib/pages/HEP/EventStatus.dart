@@ -206,9 +206,8 @@ class EventListPage extends StatelessWidget {
                                   child: Text(
                                     event.eventName,
                                     style: TextStyle(
-                                      color: event.isChecked
-                                          ? Colors.white
-                                          : Colors.white,
+                                      color: Colors
+                                          .black, // Set text color to black
                                       decoration: event.isChecked
                                           ? TextDecoration.none
                                           : TextDecoration.underline,
