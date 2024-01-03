@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'hep_profile.dart';
 import 'hep_event_details.dart';
 
+//import '../../api_connection/api_connection.dart';
 //import 'dart:convert';
 void main() {
   runApp(MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => EventListPage(),
-        '/event-summary': (context) => EventSummaryPage(),
+        '/event-summary': (context) => EventDetailsPage(),
       },
     );
   }
@@ -162,8 +163,8 @@ class EventListPage extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Text('Event List'),
-            automaticallyImplyLeading: false, // Hide the back button
-            centerTitle: false, // Align the title to the left
+            automaticallyImplyLeading: false,
+            centerTitle: false,
           ),
           body: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -228,12 +229,16 @@ class EventListPage extends StatelessWidget {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/event-summary',
-                        arguments: events);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EventSummaryPage(events: events),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white, // Background color
-                    onPrimary: Colors.black, // Text color
+                    primary: Colors.white,
+                    onPrimary: Colors.black,
                   ),
                   child: Text('View Event Summary'),
                 ),
@@ -283,11 +288,12 @@ class EventListPage extends StatelessWidget {
 }
 
 class EventSummaryPage extends StatelessWidget {
+  final List<Event> events;
+
+  EventSummaryPage({required this.events});
+
   @override
   Widget build(BuildContext context) {
-    final List<Event> events =
-        ModalRoute.of(context)!.settings.arguments as List<Event>;
-
     // Count approved and not approved events
     int approvedCount = events.where((event) => event.isChecked).length;
     int notApprovedCount = events.length - approvedCount;
