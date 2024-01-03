@@ -87,12 +87,7 @@ class _HomePageState extends State<HomePage> {
           selectedItemColor: Colors.black,
           backgroundColor: Colors.white,
           onTap: (index) {
-            if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ScanPage()),
-              );
-            } else if (index == 0) {
+            if (index == 0) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => HomePage()),
@@ -102,12 +97,12 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(builder: (context) => SearchScreen()),
               );
-            } else if (index == 4) {
+            } else if (index == 3) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => StudentProfilePage()),
               );
-            } else if (index == 3) {
+            } else if (index == 2) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Reminder()),
@@ -122,10 +117,6 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.search),
               label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.center_focus_strong),
-              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.notifications),

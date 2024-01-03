@@ -138,6 +138,61 @@ class _DropDownFormFieldState extends State<DropDownFormField> {
   }
 }
 
+class DatePickButton extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final VoidCallback onPressed;
+  final String? Function(String?)? validator;
+
+  const DatePickButton({
+    Key? key,
+    required this.label,
+    required this.controller,
+    required this.onPressed,
+    this.validator,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) {
+            return Color.fromARGB(255, 0, 0, 0);
+          },
+        ),
+        overlayColor: MaterialStateProperty.all(
+          Color.fromARGB(255, 0, 0, 0),
+        ),
+        elevation: MaterialStateProperty.all(10),
+        fixedSize: MaterialStateProperty.all(
+          Size(400, 45),
+        ),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Adjust the border radius
+          ),
+        ),
+      ),
+      child: Align(
+        alignment: Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 0),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: const Color.fromARGB(255, 255, 255, 255),
+              fontFamily: 'NotoSans-Thin',
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SignInFormField extends StatelessWidget {
   final String label;
   final bool isPassword;

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import '../form_fields.dart';
 import 'dart:ui';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
 
 class JoinEventPage extends StatelessWidget {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController matricNoController = TextEditingController();
+  TextEditingController yearAndCourseController = TextEditingController();
+  TextEditingController icNumberController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +21,7 @@ class JoinEventPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 5), // Adjusted height
+              SizedBox(height: 5),
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -47,6 +55,7 @@ class JoinEventPage extends StatelessWidget {
                                   }
                                   return null;
                                 },
+                                controller: nameController,
                               ),
                               SizedBox(height: 25),
                               SignUpFormField(
@@ -57,12 +66,12 @@ class JoinEventPage extends StatelessWidget {
                                   }
                                   return null;
                                 },
+                                controller: matricNoController,
                               ),
                               SizedBox(height: 25),
                               SignUpFormField(
                                 label: "Year and Course",
                                 validator: (value) {
-                                  // Format: 1/SECBH
                                   RegExp regex = RegExp(r'^[0-9]/[A-Z]+$',
                                       caseSensitive: false);
                                   if (!regex.hasMatch(value ?? '')) {
@@ -70,40 +79,117 @@ class JoinEventPage extends StatelessWidget {
                                   }
                                   return null;
                                 },
+                                controller: yearAndCourseController,
                               ),
                               SizedBox(height: 25),
                               SignUpFormField(
                                 label: "IC number",
                                 validator: (value) {
-                                  // Format: 021103-10-2392
                                   RegExp regex = RegExp(r'^\d{6}-\d{2}-\d{4}$');
                                   if (!regex.hasMatch(value ?? '')) {
                                     return 'Invalid format. Example: 021103-10-2392';
                                   }
                                   return null;
                                 },
+                                controller: icNumberController,
                               ),
                               SizedBox(height: 25),
                               SignUpFormField(
                                 label: "Phone Number",
                                 validator: (value) {
-                                  // Format: 018-9114102
                                   RegExp regex = RegExp(r'^\d{3}-\d{7}$');
                                   if (!regex.hasMatch(value ?? '')) {
                                     return 'Invalid format. Example: 018-9114102';
                                   }
                                   return null;
                                 },
+                                controller: phoneNumberController,
                               ),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 40), // Adjusted height
+                      SizedBox(height: 40),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Add your registration logic here
+                          onPressed: () async {
+                            String name = nameController.text;
+                            String matricNo = matricNoController.text;
+                            String yearAndCourse = yearAndCourseController.text;
+                            String icNumber = icNumberController.text;
+                            String phoneNumber = phoneNumberController.text;
+
+                            final response = await http.post(
+                              Uri.parse(API.registerEvent),
+                              body: {
+                                'name': name,
+                                'matricNo': matricNo,
+                                'yearAndCourse': yearAndCourse,
+                                'icNumber': icNumber,
+                                'phoneNumber': phoneNumber,
+                              },
+                            );
+
+                            if (response.statusCode == 200) {
+                              // Registration successful
+                              // Show success dialog
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.done, color: Colors.green),
+                                        SizedBox(width: 8.0),
+                                        Text('Success'),
+                                      ],
+                                    ),
+                                    content: Text(
+                                        'You have successfully registered!'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          // Close the dialog
+                                          Navigator.of(context).pop();
+
+                                          // Go back to the homepage
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              // Registration failed
+                              // Show failure dialog
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.error, color: Colors.red),
+                                        SizedBox(width: 8.0),
+                                        Text('Error'),
+                                      ],
+                                    ),
+                                    content: Text(
+                                        'Registration failed. Please try again.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          // Close the dialog when "OK" is pressed
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -113,7 +199,7 @@ class JoinEventPage extends StatelessWidget {
                             ),
                             elevation: MaterialStateProperty.all(10),
                             fixedSize: MaterialStateProperty.all(
-                              Size(200, 50), // Adjust the size as needed
+                              Size(200, 50),
                             ),
                           ),
                           child: Text(

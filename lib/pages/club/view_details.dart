@@ -94,23 +94,13 @@ class ViewEventPage extends StatelessWidget {
                     // Add more Text widgets to display other details
                     SizedBox(height: 10),
                     Text(
-                      'Start Date: ',
+                      'Date: ',
                       style: TextStyle(
                         fontWeight: FontWeight.bold, // Make it bold
                       ),
                     ),
                     Text(
-                      '${eventDetails['eventDetails']['startDate']}',
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'End Date: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold, // Make it bold
-                      ),
-                    ),
-                    Text(
-                      '${eventDetails['eventDetails']['endDate']}',
+                      '${eventDetails['eventDetails']['startDate']} - ${eventDetails['eventDetails']['endDate']}',
                     ),
                     SizedBox(height: 10),
                     Text(
@@ -142,7 +132,7 @@ class ViewEventPage extends StatelessWidget {
                     Text(
                       '${eventDetails['eventDetails']['status']}',
                     ),
-                    SizedBox(height: 15),
+                    SizedBox(height: 25),
                     Container(
                       alignment: Alignment.center,
                       child: ElevatedButton(

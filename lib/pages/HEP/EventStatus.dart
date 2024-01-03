@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'hep_profile.dart';
 import 'hep_event_details.dart';
+//import 'event_summary.dart';
 
 //import '../../api_connection/api_connection.dart';
 //import 'dart:convert';
@@ -205,9 +206,8 @@ class EventListPage extends StatelessWidget {
                                   child: Text(
                                     event.eventName,
                                     style: TextStyle(
-                                      color: event.isChecked
-                                          ? Colors.white
-                                          : Colors.white,
+                                      color: Colors
+                                          .black, // Set text color to black
                                       decoration: event.isChecked
                                           ? TextDecoration.none
                                           : TextDecoration.underline,
