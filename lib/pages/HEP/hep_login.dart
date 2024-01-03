@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'hep_preferences.dart';
 //import 'hep_homepage.dart';
 import 'HEP_homepage.dart';
+import 'EventStatus.dart';
 
 class HEPLoginPage extends StatefulWidget {
   const HEPLoginPage({Key? key}) : super(key: key);
@@ -152,7 +153,7 @@ class _HEPLoginPageState extends State<HEPLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(HomePage());
+            Get.to(EventListPage());
           });
         } else {
           //Fluttertoast.showToast(
@@ -162,7 +163,7 @@ class _HEPLoginPageState extends State<HEPLoginPage> {
 
           await RememberUserPrefs.storeUserInfo(userInfo);
           Future.delayed(Duration(milliseconds: 2000), () {
-            Get.to(HomePage());
+            Get.to(EventListPage());
           });
         }
       }
@@ -241,7 +242,7 @@ class _HEPLoginPageState extends State<HEPLoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) => EventListPage(),
                                   ),
                                 );
                               }
@@ -300,7 +301,7 @@ class _HEPLoginPageState extends State<HEPLoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HomePage(),
+                                  builder: (context) => EventListPage(),
                                 ),
                               );
                             },

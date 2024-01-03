@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'hep_profile.dart';
 import 'hep_event_details.dart';
+//import 'event_summary.dart';
 
 //import 'dart:convert';
 void main() {
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => EventListPage(),
-        '/event-summary': (context) => EventSummaryPage(),
+        '/event-summary': (context) =>
+            EventSummaryPage(), // Pass the events as an argument
       },
     );
   }
