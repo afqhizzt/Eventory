@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tryyy/main.dart';
+
+
 
 void main() {
   runApp(MyApp());

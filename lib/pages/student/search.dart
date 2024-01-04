@@ -3,6 +3,7 @@ import 'package:tryyy/pages/student/student_profile.dart';
 import 'student_homepage.dart';
 import 'scan.dart';
 import 'reminder.dart';
+import 'event_management.dart';
 
 class SearchScreen extends StatelessWidget {
   final TextEditingController _searchController = TextEditingController();
@@ -38,9 +39,11 @@ class SearchScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: Icon(Icons.search),
-                      onPressed: () {
-                        // Perform search or any action
-                      },
+                       onPressed: () {
+                        Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage()),
+    );},
                     ),
                     Expanded(
                       child: TextField(
@@ -54,15 +57,17 @@ class SearchScreen extends StatelessWidget {
                     ),
                     IconButton(
                       icon: Icon(Icons.cancel),
-                      onPressed: () {
+                     onPressed: () {
                         // Clear search field
                         _searchController.clear();
                       },
                     ),
                   ],
+                  
                 ),
               ),
             ),
+            
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(left: 20),
@@ -154,7 +159,12 @@ class SearchScreen extends StatelessWidget {
         selectedItemColor: Colors.white,
         backgroundColor: Colors.black,
         onTap: (index) {
-          if (index == 0) {
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ScanPage()),
+            );
+          } else if (index == 0) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => HomePage()),
@@ -164,12 +174,12 @@ class SearchScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => SearchScreen()),
             );
-          } else if (index == 3) {
+          } else if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => StudentProfilePage()),
             );
-          } else if (index == 2) {
+          } else if (index == 3) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Reminder()),
@@ -184,6 +194,10 @@ class SearchScreen extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.center_focus_strong),
+            label: 'Scan',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
