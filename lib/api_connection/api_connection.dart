@@ -1,5 +1,5 @@
 class API {
-  static const hostConnect = "http://192.168.56.1/api_eventory";
+  static const hostConnect = "http://10.211.102.235/api_eventory";
   static const hostConnectStudents = "$hostConnect/students";
 
   //student
