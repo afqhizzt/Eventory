@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'EventStatus.dart';
+import 'EventList.dart';
 
 class EventSummaryPage extends StatelessWidget {
   final List<Event> events;
@@ -25,8 +25,8 @@ class EventSummaryPage extends StatelessWidget {
               SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
-                  border:
-                      Border.all(color: Colors.white), // White outline border
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  border: Border.all(color: Color.fromARGB(255, 255, 255, 255)),
                 ),
                 child: DataTable(
                   columns: [
@@ -36,11 +36,11 @@ class EventSummaryPage extends StatelessWidget {
                   rows: [
                     DataRow(cells: [
                       DataCell(Text('Approved')),
-                      DataCell(Text('$approvedCount'))
+                      DataCell(Text('$approvedCount')),
                     ]),
                     DataRow(cells: [
                       DataCell(Text('Not Approved')),
-                      DataCell(Text('$notApprovedCount'))
+                      DataCell(Text('$notApprovedCount')),
                     ]),
                   ],
                 ),
@@ -49,6 +49,7 @@ class EventSummaryPage extends StatelessWidget {
           ),
         ),
       ),
+      backgroundColor: Color.fromARGB(255, 33, 33, 33),
     );
   }
 }

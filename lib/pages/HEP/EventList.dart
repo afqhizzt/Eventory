@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../api_connection/api_connection.dart';
 import 'hep_event_details.dart';
 import 'hep_profile.dart';
-import 'hep_search.dart';
 import 'hep_homepage.dart';
+import 'event_summary.dart';
+import 'event_details.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +20,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.black,
         textTheme: TextTheme(
           bodyText2: TextStyle(
-              color: Colors.white, fontSize: 19.0), // Increased text size
+            color: Colors.white,
+            fontSize: 19.0,
+          ), // Increased text size
         ),
       ),
       home: EventListPage(),
@@ -29,170 +31,377 @@ class MyApp extends StatelessWidget {
 }
 
 class Event {
+  final id;
   final int index;
-  final String eventName;
-  final bool isChecked;
-  final DateTime eventDate;
+  //final String? isChecked;
+  final String activityName;
+  final String? status;
+  final String director;
+  final String venue;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int maxParticipants;
+  final String category;
+  final String type;
+  final String level;
+  final String organizerCategory;
+  final String organizerLevel;
 
   Event({
+    required this.id,
     required this.index,
-    required this.eventName,
-    required this.isChecked,
-    required this.eventDate,
+    //required this.isChecked,
+    required this.activityName,
+    required this.status,
+    required this.director,
+    required this.venue,
+    required this.startDate,
+    required this.endDate,
+    required this.maxParticipants,
+    required this.category,
+    required this.type,
+    required this.level,
+    required this.organizerCategory,
+    required this.organizerLevel,
   });
+
+  bool get isChecked => status != null ? status == 'approved' : false;
 }
 
-class EventListPage extends StatelessWidget {
-  final List<Event> events = [
-    Event(
-        index: 1,
-        eventName: 'MarathonMania',
-        eventDate: DateTime.now(),
-        isChecked: false),
-    Event(
-        index: 2,
-        eventName: 'XtremeXperience',
-        eventDate: DateTime.now().add(Duration(days: 1)),
-        isChecked: false),
-    Event(
-        index: 3,
-        eventName: 'TechTrek',
-        eventDate: DateTime.now().add(Duration(days: 2)),
-        isChecked: false),
-    Event(
-        index: 4,
-        eventName: 'IdeaIgnite',
-        eventDate: DateTime.now().add(Duration(days: 3)),
-        isChecked: false),
-    Event(
-        index: 5,
-        eventName: 'InnovateSphere',
-        eventDate: DateTime.now().add(Duration(days: 4)),
-        isChecked: false),
-    Event(
-        index: 6,
-        eventName: 'MelodyFest',
-        eventDate: DateTime.now().add(Duration(days: 5)),
-        isChecked: false),
-    Event(
-        index: 7,
-        eventName: 'HarmonyJam',
-        eventDate: DateTime.now().add(Duration(days: 6)),
-        isChecked: false),
-    Event(
-        index: 8,
-        eventName: 'SonicSpectra',
-        eventDate: DateTime.now().add(Duration(days: 7)),
-        isChecked: false),
-    Event(
-        index: 9,
-        eventName: 'RoboRenaissance',
-        eventDate: DateTime.now().add(Duration(days: 8)),
-        isChecked: false),
-    Event(
-        index: 10,
-        eventName: 'Inventor\'sInsight',
-        eventDate: DateTime.now().add(Duration(days: 9)),
-        isChecked: true),
-    Event(
-        index: 11,
-        eventName: 'DisruptDev',
-        eventDate: DateTime.now().add(Duration(days: 10)),
-        isChecked: true),
-    Event(
-        index: 12,
-        eventName: 'ThinkTank',
-        eventDate: DateTime.now().add(Duration(days: 11)),
-        isChecked: true),
-    Event(
-        index: 13,
-        eventName: 'ThriveRhythm',
-        eventDate: DateTime.now().add(Duration(days: 12)),
-        isChecked: true),
-    Event(
-        index: 14,
-        eventName: 'Revolution',
-        eventDate: DateTime.now().add(Duration(days: 13)),
-        isChecked: true),
-    Event(
-        index: 15,
-        eventName: 'BeatFusion',
-        eventDate: DateTime.now().add(Duration(days: 14)),
-        isChecked: true),
-    Event(
-        index: 16,
-        eventName: 'AcousticAlchemy',
-        eventDate: DateTime.now().add(Duration(days: 15)),
-        isChecked: true),
-    Event(
-        index: 17,
-        eventName: 'GrooveGala',
-        eventDate: DateTime.now().add(Duration(days: 16)),
-        isChecked: true),
-    Event(
-        index: 18,
-        eventName: 'SymphonyShowdown',
-        eventDate: DateTime.now().add(Duration(days: 17)),
-        isChecked: true),
-    Event(
-        index: 19,
-        eventName: 'PulsePalooza',
-        eventDate: DateTime.now().add(Duration(days: 18)),
-        isChecked: true),
-    Event(
-        index: 20,
-        eventName: 'SoundSafari',
-        eventDate: DateTime.now().add(Duration(days: 19)),
-        isChecked: true),
-    // Add more events as needed
-  ];
+class EventListPage extends StatefulWidget {
+  @override
+  _EventListPageState createState() => _EventListPageState();
+}
+
+class _EventListPageState extends State<EventListPage> {
+  List<Event> events = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse(API.eventList));
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+      List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        events = data.map((item) {
+          return Event(
+            id: item['id'],
+            status: item['status'],
+            index: item['index'],
+            activityName: item['activityName'],
+            startDate: DateTime.parse(item['startDate']),
+            endDate: DateTime.parse(item['endDate']),
+            director: item['director'],
+            venue: item['venue'],
+            maxParticipants: item['maxParticipants'],
+            category: item['category'],
+            type: item['type'],
+            level: item['level'],
+            organizerCategory: item['organizerCategory'],
+            organizerLevel: item['organizerLevel'],
+          );
+        }).toList();
+      });
+    } else {
+      // If the server did not return a 200 OK response,
+      // throw an exception.
+      throw Exception('Failed to load data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Sort the events with 'not approved' status first and index in ascending order
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false, // Removes the back button
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Event List',
+            style: TextStyle(fontSize: 20.0), // Adjust the font size if needed
+          ),
+        ),
+      ),
+      backgroundColor: Color.fromARGB(255, 33, 33, 33),
+      body: Column(
+        children: [
+          YourWidgetToDisplayEvents(events: events),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EventSummaryPage(events: events),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.white,
+              onPrimary: Colors.black,
+            ),
+            child: Text('View Event Summary'),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        unselectedItemColor: Colors.black,
+        selectedItemColor: Colors.black,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EventDetailsPage()),
+            );
+          } else if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EventListPage()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HEPProfilePage()),
+            );
+          }
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Status',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.center_focus_strong),
+            label: 'Summary',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+} // Import your ViewEventPage
+
+class YourWidgetToDisplayEvents extends StatelessWidget {
+  final List<Event> events;
+
+  YourWidgetToDisplayEvents({required this.events});
+
+  @override
+  Widget build(BuildContext context) {
+    // Sort the events with 'not approved' status first and then approved events
     events.sort((a, b) {
-      if (a.isChecked && !b.isChecked) {
-        return 1;
-      } else if (!a.isChecked && b.isChecked) {
+      if (a.status == null && b.status == null) {
+        return 0;
+      } else if (a.status == null) {
         return -1;
+      } else if (b.status == null) {
+        return 1;
       } else {
-        return a.index.compareTo(b.index);
+        return a.status!.compareTo(b.status!);
       }
     });
 
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: [
+          DataColumn(
+            label: Text(
+              'Index',
+              style: TextStyle(color: Colors.white), // Set text color
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Event Name',
+              style: TextStyle(color: Colors.white), // Set text color
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Status',
+              style: TextStyle(color: Colors.white), // Set text color
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Event Date',
+              style: TextStyle(color: Colors.white), // Set text color
+            ),
+          ),
+        ],
+        rows: events.map((event) {
+          return DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  '${events.indexOf(event) + 1}',
+                  style: TextStyle(color: Colors.white), // Set text color
+                ),
+              ),
+              DataCell(
+                GestureDetector(
+                  onTap: () async {
+                    // Fetch the full event details from the database using eventId
+                    // Replace 'YOUR_PHP_SCRIPT_URL' with the actual URL where you host get_event_details.php
+                    var response = await http
+                        .get(Uri.parse('${API.getId}?id=${event.id}'));
+                    if (response.statusCode == 200) {
+                      var eventDetails = json.decode(response.body);
+
+                      // Navigate to the new page with the fetched event details
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EventDetailPage(event: event),
+                        ),
+                      );
+                    } else {
+                      // Handle error
+                      print('Failed to fetch event details');
+                    }
+                  },
+                  child: Text(
+                    event.activityName,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              DataCell(
+                event.status != null
+                    ? Icon(Icons.check, color: Colors.green) // Checked
+                    : Icon(Icons.clear, color: Colors.red), // Unchecked
+              ),
+              DataCell(
+                Text(
+                  '${event.startDate.day}/${event.startDate.month}/${event.startDate.year}',
+                  style: TextStyle(color: Colors.white), // Set text color
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class EventDetailPage extends StatelessWidget {
+  final Event event;
+
+  EventDetailPage({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event List'),
+        title: Text('Event Detail'),
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: [
-              DataColumn(label: Text('Index')),
-              DataColumn(label: Text('Event Name')),
-              DataColumn(label: Text('Status')),
-              DataColumn(label: Text('Event Date')),
-            ],
-            rows: events.map((event) {
-              return DataRow(
-                cells: [
-                  DataCell(Text('${event.index}')),
-                  DataCell(Container(
-                    width: 200, // Adjust the width as needed
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(event.eventName),
-                    ),
-                  )),
-                  DataCell(Icon(event.isChecked ? Icons.check : Icons.clear)),
-                  DataCell(Text(
-                      '${event.eventDate.day}/${event.eventDate.month}/${event.eventDate.year}')),
-                ],
-              );
-            }).toList(),
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Activity Name: ${event.activityName}',
+                style: TextStyle(fontSize: 20)),
+            /*Text('Event Director: ${event.director}',
+                style: TextStyle(fontSize: 16)),
+            Text('Venue: ${event.venue}', style: TextStyle(fontSize: 16)),
+            Text('Start Date: ${event.startDate.toLocal()}',
+                style: TextStyle(fontSize: 16)),
+            Text('End Date: ${event.endDate.toLocal()}',
+                style: TextStyle(fontSize: 16)),
+            Text('Event Category: ${event.category}',
+                style: TextStyle(fontSize: 16)),
+            Text('Event Type: ${event.type}', style: TextStyle(fontSize: 16)),
+            Text('Event Level: ${event.level}', style: TextStyle(fontSize: 16)),
+            Text('Organizer Category: ${event.organizerCategory}',
+                style: TextStyle(fontSize: 16)),
+            Text('Organizer Level: ${event.organizerLevel}',
+                style: TextStyle(fontSize: 16)),
+            SizedBox(height: 20),*/
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Event Approved'),
+                      content: Text('This event has been approved!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Close the dialog
+                            Navigator.pop(context); // Close the EventDetailPage
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green, // Background color
+              ),
+              child: Text('Approve'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ApprovedEventDetailPage extends StatelessWidget {
+  final Event event;
+
+  ApprovedEventDetailPage({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Event Detail - Approved'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Activity Name: ${event.activityName}',
+                style: TextStyle(fontSize: 20)),
+            /*Text('Event Director: ${event.director}',
+                style: TextStyle(fontSize: 16)),
+            Text('Venue: ${event.venue}', style: TextStyle(fontSize: 16)),
+            Text('Start Date: ${event.startDate}',
+                style: TextStyle(fontSize: 16)),
+            //Text('End Date:', style: TextStyle(fontSize: 16)),
+            Text('Number of Participants:${event.maxParticipants}',
+                style: TextStyle(fontSize: 16)),
+            Text('Event Category: ${event.category}',
+                style: TextStyle(fontSize: 16)),
+            Text('Event Type: ${event.type}', style: TextStyle(fontSize: 16)),
+            Text('Event Level: ${event.level}', style: TextStyle(fontSize: 16)),
+            Text('Organizer Category: ${event.organizerCategory}',
+                style: TextStyle(fontSize: 16)),
+            Text('Organizer Level: ${event.organizerLevel}',
+                style: TextStyle(fontSize: 16)),*/
+            SizedBox(height: 20),
+          ],
         ),
       ),
     );

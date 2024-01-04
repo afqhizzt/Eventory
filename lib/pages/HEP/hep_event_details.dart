@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'hep_profile.dart';
-import 'EventStatus.dart';
+import 'EventList.dart';
 
 class EventDetailsPage extends StatelessWidget {
   @override

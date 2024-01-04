@@ -21,4 +21,7 @@ class API {
   static const signUpHEP = "$hostConnect/hep/signup.php";
   static const validateEmailHEP = "$hostConnect/hep/validate_email.php";
   static const loginHEP = "$hostConnect/hep/login.php";
+  static const eventStatus = "$hostConnect/hep/event_status.php";
+  static const eventList = "$hostConnect/hep/event_list.php";
+  static const getId = "$hostConnect/hep/get_id.php";
 }

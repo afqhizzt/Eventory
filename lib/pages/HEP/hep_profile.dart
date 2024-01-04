@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'hep_event_details.dart';
 import 'hep_edit_page.dart';
-import 'EventStatus.dart';
+import 'EventList.dart';
+//import 'EventList.dart';
 
 class HEPProfilePage extends StatelessWidget {
   @override
