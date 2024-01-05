@@ -309,18 +309,21 @@ class EventDetailPage extends StatelessWidget {
 
   EventDetailPage({required this.event});
 
-  Future<void> updateStatus(BuildContext context, String status) async {
+  Future<void> updateStatus(
+      BuildContext context, String status, String approval) async {
     try {
       // Update the status in the database
-      var updateResponse = await http
-          .get(Uri.parse('${API.getId}?id=${event.id}&status=$status'));
+      var updateResponse = await http.get(
+        Uri.parse(
+            '${API.getId}?id=${event.id}&status=$status&approval=$approval'),
+      );
 
       if (updateResponse.statusCode == 200) {
         // Show the approval or not approval dialog based on the status
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            if (status == 'approved') {
+            if (approval == 'approved') {
               return AlertDialog(
                 title: Text('Event Approved'),
                 content: Text('This event has been approved!'),
@@ -414,7 +417,7 @@ class EventDetailPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await updateStatus(context, 'approved');
+                    await updateStatus(context, 'approved', 'approved');
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.green, // Background color
@@ -424,7 +427,7 @@ class EventDetailPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await updateStatus(context, 'not approved');
+                    await updateStatus(context, 'approved', 'not approved');
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // Background color
