@@ -31,8 +31,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Event {
-  final id;
-  final int index;
+  final int id;
   //final String? isChecked;
   final String activityName;
   final String? status;
@@ -49,7 +48,6 @@ class Event {
 
   Event({
     required this.id,
-    required this.index,
     //required this.isChecked,
     required this.activityName,
     required this.status,
@@ -92,15 +90,14 @@ class _EventListPageState extends State<EventListPage> {
       setState(() {
         events = data.map((item) {
           return Event(
-            id: item['id'],
+            id: int.parse(item['id']),
             status: item['status'],
-            index: item['index'],
             activityName: item['activityName'],
             startDate: DateTime.parse(item['startDate']),
             endDate: DateTime.parse(item['endDate']),
             director: item['director'],
             venue: item['venue'],
-            maxParticipants: item['maxParticipants'],
+            maxParticipants: int.parse(item['maxParticipants']),
             category: item['category'],
             type: item['type'],
             level: item['level'],
@@ -255,19 +252,28 @@ class YourWidgetToDisplayEvents extends StatelessWidget {
                 GestureDetector(
                   onTap: () async {
                     // Fetch the full event details from the database using eventId
-                    // Replace 'YOUR_PHP_SCRIPT_URL' with the actual URL where you host get_event_details.php
                     var response = await http
-                        .get(Uri.parse('${API.getId}?id=${event.id}'));
+                        .get(Uri.parse('${API.eventList}?id=${event.id}'));
                     if (response.statusCode == 200) {
                       var eventDetails = json.decode(response.body);
 
                       // Navigate to the new page with the fetched event details
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EventDetailPage(event: event),
-                        ),
-                      );
+                      if (event.status == 'approved') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ApprovedEventDetailPage(event: event),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventDetailPage(event: event),
+                          ),
+                        );
+                      }
                     } else {
                       // Handle error
                       print('Failed to fetch event details');
@@ -303,6 +309,76 @@ class EventDetailPage extends StatelessWidget {
 
   EventDetailPage({required this.event});
 
+  Future<void> updateStatus(BuildContext context, String status) async {
+    try {
+      // Update the status in the database
+      var updateResponse = await http
+          .get(Uri.parse('${API.getId}?id=${event.id}&status=$status'));
+
+      if (updateResponse.statusCode == 200) {
+        // Show the approval or not approval dialog based on the status
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            if (status == 'approved') {
+              return AlertDialog(
+                title: Text('Event Approved'),
+                content: Text('This event has been approved!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context); // Close the EventDetailPage
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            } else {
+              String notApproveReason = '';
+
+              return AlertDialog(
+                title: Text('Event Not Approved'),
+                content: Column(
+                  children: [
+                    Text('This event has not been approved.'),
+                    TextField(
+                      decoration: InputDecoration(labelText: 'Reason'),
+                      onChanged: (value) {
+                        notApproveReason = value;
+                      },
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context, 'Not Approved: $notApproveReason');
+                    },
+                    child: Text('Confirm Not Approve'),
+                  ),
+                ],
+              );
+            }
+          },
+        );
+      } else {
+        // Handle error
+        print('Failed to update status');
+      }
+    } catch (error) {
+      // Handle error
+      print('Error updating status: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -316,12 +392,13 @@ class EventDetailPage extends StatelessWidget {
           children: [
             Text('Activity Name: ${event.activityName}',
                 style: TextStyle(fontSize: 20)),
-            /*Text('Event Director: ${event.director}',
+            Text('Event Director: ${event.director}',
                 style: TextStyle(fontSize: 16)),
             Text('Venue: ${event.venue}', style: TextStyle(fontSize: 16)),
-            Text('Start Date: ${event.startDate.toLocal()}',
+            Text('Start Date: ${event.startDate}',
                 style: TextStyle(fontSize: 16)),
-            Text('End Date: ${event.endDate.toLocal()}',
+            Text('End Date: ${event.endDate}', style: TextStyle(fontSize: 16)),
+            Text('Number of Participants:${event.maxParticipants}',
                 style: TextStyle(fontSize: 16)),
             Text('Event Category: ${event.category}',
                 style: TextStyle(fontSize: 16)),
@@ -331,33 +408,31 @@ class EventDetailPage extends StatelessWidget {
                 style: TextStyle(fontSize: 16)),
             Text('Organizer Level: ${event.organizerLevel}',
                 style: TextStyle(fontSize: 16)),
-            SizedBox(height: 20),*/
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Event Approved'),
-                      content: Text('This event has been approved!'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context); // Close the dialog
-                            Navigator.pop(context); // Close the EventDetailPage
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    );
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await updateStatus(context, 'approved');
                   },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.green, // Background color
-              ),
-              child: Text('Approve'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green, // Background color
+                    onPrimary: Colors.white, // Text color
+                  ),
+                  child: Text('Approve'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await updateStatus(context, 'not approved');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red, // Background color
+                    onPrimary: Colors.white, // Text color
+                  ),
+                  child: Text('Not Approve'),
+                ),
+              ],
             ),
           ],
         ),
@@ -384,12 +459,13 @@ class ApprovedEventDetailPage extends StatelessWidget {
           children: [
             Text('Activity Name: ${event.activityName}',
                 style: TextStyle(fontSize: 20)),
-            /*Text('Event Director: ${event.director}',
+            Text('Event Director: ${event.director}',
                 style: TextStyle(fontSize: 16)),
             Text('Venue: ${event.venue}', style: TextStyle(fontSize: 16)),
             Text('Start Date: ${event.startDate}',
                 style: TextStyle(fontSize: 16)),
-            //Text('End Date:', style: TextStyle(fontSize: 16)),
+            Text('End Date: ${event.startDate}',
+                style: TextStyle(fontSize: 16)),
             Text('Number of Participants:${event.maxParticipants}',
                 style: TextStyle(fontSize: 16)),
             Text('Event Category: ${event.category}',
@@ -399,7 +475,7 @@ class ApprovedEventDetailPage extends StatelessWidget {
             Text('Organizer Category: ${event.organizerCategory}',
                 style: TextStyle(fontSize: 16)),
             Text('Organizer Level: ${event.organizerLevel}',
-                style: TextStyle(fontSize: 16)),*/
+                style: TextStyle(fontSize: 16)),
             SizedBox(height: 20),
           ],
         ),
