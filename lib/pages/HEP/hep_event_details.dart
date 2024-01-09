@@ -6,7 +6,7 @@ class EventDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Event Status'),
@@ -15,7 +15,6 @@ class EventDetailsPage extends StatelessWidget {
             tabs: [
               Tab(text: 'Approved Events'),
               Tab(text: 'Non Approved Events'),
-              Tab(text: 'Past Events'),
             ],
             indicatorColor: Colors.black,
           ),
@@ -110,11 +109,11 @@ class EventDetailsPage extends StatelessWidget {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Status',
+              label: 'Approval',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.center_focus_strong),
-              label: 'Summary',
+              label: 'Status',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

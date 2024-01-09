@@ -4,9 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../api_connection/api_connection.dart';
 import 'hep_event_details.dart';
 import 'hep_profile.dart';
-import 'hep_homepage.dart';
 import 'event_summary.dart';
-import 'event_details.dart';
 
 void main() {
   runApp(MyApp());
@@ -174,11 +172,11 @@ class _EventListPageState extends State<EventListPage> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Status',
+            label: 'Approval',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.center_focus_strong),
-            label: 'Summary',
+            label: 'Status',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

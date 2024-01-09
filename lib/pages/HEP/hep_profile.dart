@@ -252,11 +252,11 @@ class HEPProfilePage extends StatelessWidget {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Status',
+              label: 'Approval',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.center_focus_strong),
-              label: 'Summary',
+              label: 'Status',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
