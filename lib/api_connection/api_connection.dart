@@ -8,6 +8,14 @@ class API {
   static const login = "$hostConnect/students/login.php";
   static const post = "$hostConnect/students/post.php";
   static const registerEvent = "$hostConnect/students/register_event.php";
+  static const studentEditInfoPage =
+      "$hostConnect/students/studentEditInfoPage.php";
+  static const activities = "$hostConnect/students/activities.php";
+  static const getFollowersCount =
+      "$hostConnect/students/getFollowersCount.php";
+  static const getFollowingCount =
+      "$hostConnect/students/getFollowingCount.php";
+  static const getPostCount = "$hostConnect/students/getPostsCount.php";
 
   //club
   static const signUpClub = "$hostConnect/clubs/signup.php";
