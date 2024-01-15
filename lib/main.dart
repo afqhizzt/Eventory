@@ -6,8 +6,11 @@ import 'pages/hello_flutter.dart';
 import 'pages/student/student_registration.dart';
 import 'pages/club/club_registration.dart';
 import 'pages/HEP/hep_registration.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+Future main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  //await Firebase.initializeApp();
   runApp(MyApp());
 }
 

@@ -11,12 +11,36 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'student_preferences.dart';
 import 'student_homepage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class StudentLoginPage extends StatefulWidget {
   const StudentLoginPage({Key? key}) : super(key: key);
 
   @override
   _StudentLoginPageState createState() => _StudentLoginPageState();
+}
+
+class GoogleSignInProvider extends ChangeNotifier {
+  final googleSignIn = GoogleSignIn();
+  GoogleSignInAccount? _user;
+  GoogleSignInAccount get user => _user!;
+
+  Future googleLogin() async {
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) return;
+    _user = googleUser;
+
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+
+    notifyListeners();
+  }
 }
 
 class _StudentLoginPageState extends State<StudentLoginPage> {
@@ -126,6 +150,24 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     _authStateSubscription.cancel();
     super.dispose();
   }*/
+
+  GoogleSignInProvider _googleSignInProvider = GoogleSignInProvider();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _googleSignInProvider.addListener(() {
+      // This will be called whenever the GoogleSignInProvider is updated.
+      // You can perform actions based on the sign-in state here.
+      if (_googleSignInProvider.user != null) {
+        // User signed in, perform necessary actions
+        print(
+            "Google Sign-In Successful: ${_googleSignInProvider.user.displayName}");
+        // You can navigate to the next screen or perform other actions here
+      }
+    });
+  }
 
   var formKey = GlobalKey<FormState>();
   var emailController = TextEditingController();
@@ -293,16 +335,8 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                           ),
                           SizedBox(height: 10),
                           ElevatedButton(
-                            onPressed: () {
-                              /*if (formKey.currentState!.validate()) {
-                                loginUserNow();
-                              }*/
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(),
-                                ),
-                              );
+                            onPressed: () async {
+                              await _googleSignInProvider.googleLogin();
                             },
                             style: ButtonStyle(
                               backgroundColor:
