@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tryyy/main.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-
+import 'package:tryyy/api_connection/api_connection.dart';
+import 'package:tryyy/pages/student/reminder.dart';
+import 'package:tryyy/pages/student/search.dart';
+import 'package:tryyy/pages/student/student_homepage.dart';
+import 'package:tryyy/pages/student/student_profile.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,35 +17,74 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProfilePage(),
+      home: EventManagement(),
     );
   }
 }
 
 class Event {
-  final String title;
-  final String date;
-  final String time;
-  final String location;
-  final String imagePath;
+  final String id;
+  final String username;
+  final String imageUrl;
+  final String caption;
+  final String events;
 
-  Event(this.title, this.date, this.time, this.location, this.imagePath);
+  Event({
+    required this.id,
+    required this.username,
+    required this.imageUrl,
+    required this.caption,
+    required this.events,
+  });
+
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      id: json['id'] ?? '',
+      username: json['username'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      caption: json['caption'] ?? '',
+      events: json['events'] ?? '',
+    );
+  }
 }
 
-class ProfilePage extends StatelessWidget {
-  final List<Event> eventList = [
-    Event('First Year Experience', '4 NOV 2023', '2pm - 9pm', 'BK 7',
-        'image/pic1.jpeg'),
-    Event('Second Year Experience', '5 NOV 2023', '3pm - 10pm', 'BK 8',
-        'image/pic2.jpeg'),
-    Event('Third Year Experience', '6 NOV 2023', '4pm - 11pm', 'BK 9',
-        'image/pic3.jpeg'),
-    Event('Fourth Year Experience', '7 NOV 2023', '5pm - 12am', 'BK 10',
-        'image/pic4.jpeg'),
-    Event('Fifth Year Experience', '8 NOV 2023', '6pm - 1am', 'BK 11',
-        'image/pic1.jpeg'),
-    // Add more events as needed
-  ];
+class EventManagement extends StatefulWidget {
+  @override
+  _EventManagementState createState() => _EventManagementState();
+}
+
+class _EventManagementState extends State<EventManagement> {
+  List<Event> posts = [];
+  List<Event> filteredPosts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents();
+  }
+
+  Future<void> fetchEvents() async {
+  final response = await http.get(Uri.parse(API.post));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    setState(() {
+      posts = data.map((item) => Event.fromJson(item)).toList();
+      filteredPosts = List.from(posts);
+    });
+  } else {
+    throw Exception('Failed to load posts');
+  }
+}
+
+  void filterPosts(String query) {
+    setState(() {
+      filteredPosts = posts
+          .where((post) =>
+              post.username.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +96,7 @@ class ProfilePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () {
-                // Handle the "Edit" button press in the app bar
-                // You can add code here to perform actions on edit
-              },
+              onPressed: () {},
               child: Text(
                 'Edit',
                 style: TextStyle(color: Colors.red),
@@ -70,9 +111,11 @@ class ProfilePage extends StatelessWidget {
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextField(
+              onChanged: (query) {
+                filterPosts(query);
+              },
               decoration: InputDecoration(
                 hintText: 'Search...',
                 filled: true,
@@ -90,134 +133,113 @@ class ProfilePage extends StatelessWidget {
       ),
       body: ListView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: eventList.length * 2 -
-            1, // Adjust the item count to include dividers
+        itemCount: filteredPosts.length,
         itemBuilder: (context, index) {
           if (index.isOdd) {
             return Divider(
               color: Colors.black,
-              height: 8, // Set the height of the divider
+              height: 8,
             );
           }
           final eventIndex = index ~/ 2;
           return buildEventWidget(
-            eventList[eventIndex].title,
-            eventList[eventIndex].date,
-            eventList[eventIndex].time,
-            eventList[eventIndex].location,
-            eventList[eventIndex].imagePath,
+            filteredPosts[eventIndex].username,
+            filteredPosts[eventIndex].imageUrl,
+            filteredPosts[eventIndex].caption,
+            filteredPosts[eventIndex].events,
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        backgroundColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        selectedItemColor: Colors.black,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 24),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search, size: 24),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner, size: 24),
-            label: 'Scan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications, size: 24),
-            label: 'Notification',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
-          ),
-        ],
-        onTap: (int index) {
-          // Handle navigation based on the index
-          switch (index) {
-            case 0:
-              // Handle the "Home" button press
-              break;
-            case 1:
-              // Handle the "Search" button press
-              break;
-            case 2:
-              // Handle the "Scan" button press
-              break;
-            case 3:
-              // Handle the "Notification" button press
-              break;
-            case 4:
-              // Handle the "Profile" button press
-              break;
-          }
-        },
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Colors.white,
+        ),
+        child: BottomNavigationBar(
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          unselectedItemColor: Colors.black,
+          selectedItemColor: Colors.black,
+          backgroundColor: Colors.white,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen()),
+              );
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StudentProfilePage()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Reminder()),
+              );
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications),
+              label: 'Notification',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildEventWidget(String title, String date, String time,
-      String location, String imagePath) {
+  Widget buildEventWidget(
+    String title,
+    String imageUrl,
+    String caption,
+    String events,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(8.0),
+          Text(
+            'Title: $title',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
-          SizedBox(width: 8.0), // Add some space between the image and text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                Text(
-                  '----------------------------------------------------------------------------',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                Text(
-                  date,
-                  style: TextStyle(fontSize: 22, color: Colors.grey),
-                ),
-                Text(
-                  time,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-                Text(
-                  location,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              ],
+          Text(
+            'Caption: $caption',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              // Handle "View More" button press
-            },
-            child: Text(
-              'View More',
-              style: TextStyle(fontSize: 16, color: Colors.blue),
-            ),
-          ),
+          ElevatedButton(
+          onPressed: () {
+            // Handle "View More" button press
+            // You can navigate to another screen or show more details
+            // about the event when the button is pressed
+          },
+          child: Text('View More'),
+        ),
         ],
       ),
     );

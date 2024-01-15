@@ -22,7 +22,7 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       username: json['username'],
-      imageUrl: json['imageUrl'], // Adjust the base URL
+      imageUrl: json['imageUrl'],
       caption: json['caption'],
     );
   }
@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> {
             post.imageUrl,
             fit: BoxFit.cover,
             width: double.infinity,
-            height: 400.00,
+            height: 400.0,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

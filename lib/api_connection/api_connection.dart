@@ -1,5 +1,5 @@
 class API {
-  static const hostConnect = "http://192.168.56.1/api_eventory";
+  static const hostConnect = "http://10.211.102.7/api_eventory";
   static const hostConnectStudents = "$hostConnect/students";
 
   //student
@@ -16,6 +16,7 @@ class API {
   static const getFollowingCount =
       "$hostConnect/students/getFollowingCount.php";
   static const getPostCount = "$hostConnect/students/getPostsCount.php";
+
 
   //club
   static const signUpClub = "$hostConnect/clubs/signup.php";

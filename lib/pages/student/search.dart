@@ -41,9 +41,9 @@ class SearchScreen extends StatelessWidget {
                       icon: Icon(Icons.search),
                        onPressed: () {
                         Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProfilePage()),
-    );},
+                          context,
+                          MaterialPageRoute(builder: (context) => EventManagement()),
+                        );},
                     ),
                     Expanded(
                       child: TextField(
@@ -148,67 +148,53 @@ class SearchScreen extends StatelessWidget {
   }
 
   Widget bottomNavigationBar(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        canvasColor: Colors.black,
+  return BottomNavigationBar(
+    showSelectedLabels: true,
+    showUnselectedLabels: true,
+    unselectedItemColor: Colors.black,
+    selectedItemColor: Colors.black,
+    backgroundColor: Colors.white,
+    onTap: (index) {
+      if (index == 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else if (index == 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SearchScreen()),
+        );
+      } else if (index == 3) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => StudentProfilePage()),
+        );
+      } else if (index == 2) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Reminder()),
+        );
+      }
+    },
+    items: [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: 'Home',
       ),
-      child: BottomNavigationBar(
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        unselectedItemColor: Colors.white,
-        selectedItemColor: Colors.white,
-        backgroundColor: Colors.black,
-        onTap: (index) {
-          if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ScanPage()),
-            );
-          } else if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SearchScreen()),
-            );
-          } else if (index == 4) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => StudentProfilePage()),
-            );
-          } else if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Reminder()),
-            );
-          }
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.center_focus_strong),
-            label: 'Scan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notification',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+      BottomNavigationBarItem(
+        icon: Icon(Icons.search),
+        label: 'Search',
       ),
-    );
-  }
+      BottomNavigationBarItem(
+        icon: Icon(Icons.notifications),
+        label: 'Notification',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.person),
+        label: 'Profile',
+      ),
+    ],
+  );
+}
 }
