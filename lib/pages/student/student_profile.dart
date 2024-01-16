@@ -158,7 +158,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     }
   }
 
-Future<void> _handleReview() async {
+  Future<void> _handleReview() async {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => FeedbackAndReviews()),
@@ -168,62 +168,63 @@ Future<void> _handleReview() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-appBar: AppBar(
-  title: Text(
-    'Eventory',
-    style: TextStyle(
-      color: Colors.white,
-    ),
-  ),
-  backgroundColor: Colors.black,
-  actions: [
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              // Handle the "Edit" button press in the app bar
-              // You can add code here to perform actions on edit
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditProfilePage(),
-                ),
-              );
-            },
-            child: Text(
-              'Edit',
-              style: TextStyle(color: Colors.red),
-            ),
-            style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
-              elevation: 0,
-            ),
+      appBar: AppBar(
+        title: Text(
+          'Eventory',
+          style: TextStyle(
+            color: Colors.white,
           ),
-          SizedBox(width: 8), // Add some spacing between the buttons
-          ElevatedButton(
-            onPressed: () {
-              // Handle the "Review" button press in the app bar
-              // You can add code here to perform actions on review
-              // For example, you might navigate to a review screen
-              _handleReview();
-              print('Review button pressed!');
-            },
-            child: Text(
-              'Review',
-              style: TextStyle(color: Colors.green), // Customize the color
-            ),
-            style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
-              elevation: 0,
+        ),
+        backgroundColor: Colors.black,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the "Edit" button press in the app bar
+                    // You can add code here to perform actions on edit
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Edit',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    elevation: 0,
+                  ),
+                ),
+                SizedBox(width: 8), // Add some spacing between the buttons
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle the "Review" button press in the app bar
+                    // You can add code here to perform actions on review
+                    // For example, you might navigate to a review screen
+                    _handleReview();
+                    print('Review button pressed!');
+                  },
+                  child: Text(
+                    'Review',
+                    style:
+                        TextStyle(color: Colors.green), // Customize the color
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    elevation: 0,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-    ),
-  ],
-),
       body: SingleChildScrollView(
         child: LayoutBuilder(
           builder: (context, constraints) {

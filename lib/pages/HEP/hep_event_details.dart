@@ -1,8 +1,72 @@
 import 'package:flutter/material.dart';
-import 'hep_profile.dart';
 import 'EventList.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
+  @override
+  _EventDetailsPageState createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
+  late List<Event> approvedEvents = [];
+  late List<Event> notApprovedEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the events from the database
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      final response = await http.get(Uri.parse(API.eventList));
+
+      if (response.statusCode == 200) {
+        // Check if the response body is not null
+        if (response.body != null) {
+          List<dynamic> data = json.decode(response.body);
+
+          List<Event> allEvents = data.map((item) {
+            return Event(
+              id: int.parse(item['id']),
+              status: item['status'],
+              activityName: item['activityName'],
+              startDate: DateTime.parse(item['startDate']),
+              endDate: DateTime.parse(item['endDate']),
+              director: item['director'],
+              venue: item['venue'],
+              maxParticipants: int.parse(item['maxParticipants']),
+              category: item['category'],
+              type: item['type'],
+              level: item['level'],
+              organizerCategory: item['organizerCategory'],
+              organizerLevel: item['organizerLevel'],
+              imageUrl: item['imageUrl'],
+              approval: item['approval'],
+            );
+          }).toList();
+
+          // Filter events based on approval status
+          approvedEvents =
+              allEvents.where((event) => event.approval == 'approved').toList();
+          notApprovedEvents = allEvents
+              .where((event) => event.approval == 'not approved')
+              .toList();
+          setState(() {});
+        } else {
+          print('Error: Response body is null');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (error) {
+      print('Error fetching data: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -14,73 +78,15 @@ class EventDetailsPage extends StatelessWidget {
           bottom: TabBar(
             tabs: [
               Tab(text: 'Approved Events'),
-              Tab(text: 'Non Approved Events'),
+              Tab(text: 'Not Approved Events'),
             ],
             indicatorColor: Colors.black,
           ),
         ),
         body: TabBarView(
           children: <Widget>[
-            // Add your other TabBarView content here
-            ...[
-              CategoryPage(
-                images: [
-                  'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/auditions-design-template-381abbb854d0e3ab94376d94471d9e6a_screen.jpg?ts=1636999425',
-                  'http://www.flyinginkpot.com/wp-content/uploads/1418979779-TPO-NYE-Concert-poster.jpg'
-                ],
-                descriptions: [
-                  Description(
-                    director: 'Hanis Hidayu',
-                    eventApprover: 'Encik Saiful',
-                    date: 'September 9&10, 2023',
-                  ),
-                  Description(
-                    director: 'Hanbin',
-                    eventApprover: 'Encik Rey',
-                    date: 'September 9&10, 2023',
-                  ),
-                ],
-              ),
-              CategoryPage(
-                images: [
-                  'https://inspirasimediaonline.files.wordpress.com/2023/07/hausboom-music-2023_poster.png?w=768',
-                  'https://www.dyeworks.net/images/npca_birdpark_full.png'
-                ],
-                descriptions: [
-                  Description(
-                    director: 'Hanis Hidayu',
-                    eventApprover: 'Encik Saiful',
-                    date: 'September 9&10, 2023',
-                  ),
-                  Description(
-                    director: 'Lee Chong Wei',
-                    eventApprover: 'Encik Nizam',
-                    date: 'December 25, 2022',
-                  ),
-                ],
-              ),
-              CategoryPage(
-                images: [
-                  'http://2.bp.blogspot.com/-QgccMy-hGBA/Tm9kfTj0L7I/AAAAAAAAAE0/RS7G3OaW6Xs/s640/innovation+master+for+utm.jpg',
-                  'http://greyareanews.com/wp-content/uploads/2016/09/Audition-Poster-Sting-Gangsters.jpg'
-                ],
-                descriptions: [
-                  Description(
-                    director: 'Lee Chong Wei',
-                    eventApprover: 'Encik Nizam',
-                    date: 'December 25, 2022',
-                  ),
-                  Description(
-                    director: 'Lee Chong Wei',
-                    eventApprover: 'Encik Nizam',
-                    date: 'December 25, 2022',
-                  ),
-                ],
-              ),
-            ].map((widget) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: widget,
-                )),
+            YourWidgetToDisplayEvents(events: approvedEvents),
+            YourWidgetToDisplayEvents(events: notApprovedEvents),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -90,19 +96,16 @@ class EventDetailsPage extends StatelessWidget {
           selectedItemColor: Colors.black,
           onTap: (index) {
             if (index == 1) {
+              // Navigate to EventDetailsPage
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => EventDetailsPage()),
               );
             } else if (index == 0) {
+              // Navigate to EventListPage
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => EventListPage()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HEPProfilePage()),
               );
             }
           },
@@ -115,10 +118,6 @@ class EventDetailsPage extends StatelessWidget {
               icon: Icon(Icons.center_focus_strong),
               label: 'Status',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
           ],
         ),
       ),
@@ -126,99 +125,83 @@ class EventDetailsPage extends StatelessWidget {
   }
 }
 
-class CategoryPage extends StatelessWidget {
-  final List<String> images;
-  final List<Description> descriptions;
+class YourWidgetToDisplayEvents extends StatelessWidget {
+  final List<Event> events;
 
-  CategoryPage({
-    required this.images,
-    required this.descriptions,
-  });
+  YourWidgetToDisplayEvents({required this.events});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: List.generate(
-          images.length,
-          (index) => Column(
-            children: [
-              ImageSection(imageURL: images[index]),
-              DescriptionSection(description: descriptions[index]),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ImageSection extends StatelessWidget {
-  final String imageURL;
-
-  ImageSection({required this.imageURL});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 500, // Adjust the height as needed
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.white,
-          width: 5.0,
-        ),
-        borderRadius: BorderRadius.circular(15.0), // Make borders round
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10.0), // Adjust the clip radius
-        child: Image.network(
-          imageURL,
-          fit: BoxFit.cover, // Adjust the fit to cover the entire box
-        ),
-      ),
-    );
-  }
-}
-
-class DescriptionSection extends StatelessWidget {
-  final Description description;
-
-  DescriptionSection({required this.description});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(36.0),
-      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Director of the Event: ${description.director}',
-            style: TextStyle(fontSize: 20.0), // Adjust the font size here
-          ),
-          Text(
-            'Event Approved By: ${description.eventApprover}',
-            style: TextStyle(fontSize: 20.0), // Adjust the font size here
-          ),
-          Text(
-            'Date of Event: ${description.date}',
-            style: TextStyle(fontSize: 20.0), // Adjust the font size here
-          ),
-          // Add more description content as needed
+          // Display events based on approval status
+          for (Event event in events)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(30), // Apply border radius
+                    border: Border.all(
+                      color: Colors.white, // Border color
+                      width: 5.0, // Border width
+                    ),
+                  ),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: 20), // Space on left and right
+                  height: 500, // Set the height
+                  width: 500, // Set the width
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(25), // Inner border radius
+                    child: Image.network(
+                      '${event.imageUrl}',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Event Name: ${event.activityName}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text('Event Director: ${event.director}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Venue: ${event.venue}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Start Date: ${event.startDate}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('End Date: ${event.endDate}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Number of Participants:${event.maxParticipants}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Event Category: ${event.category}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Event Type: ${event.type}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Event Level: ${event.level}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Organizer Category: ${event.organizerCategory}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Organizer Level: ${event.organizerLevel}',
+                          style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Divider(),
+              ],
+            ),
         ],
       ),
     );
   }
-}
-
-class Description {
-  final String director;
-  final String eventApprover;
-  final String date;
-
-  Description({
-    required this.director,
-    required this.eventApprover,
-    required this.date,
-  });
 }

@@ -43,6 +43,8 @@ class Event {
   final String level;
   final String organizerCategory;
   final String organizerLevel;
+  final String imageUrl;
+  final String? approval;
 
   Event({
     required this.id,
@@ -59,6 +61,8 @@ class Event {
     required this.level,
     required this.organizerCategory,
     required this.organizerLevel,
+    required this.imageUrl,
+    required this.approval,
   });
 
   bool get isChecked => status != null ? status == 'approved' : false;
@@ -101,6 +105,8 @@ class _EventListPageState extends State<EventListPage> {
             level: item['level'],
             organizerCategory: item['organizerCategory'],
             organizerLevel: item['organizerLevel'],
+            imageUrl: item['imageUrl'],
+            approval: item['approval'],
           );
         }).toList();
       });
@@ -162,11 +168,6 @@ class _EventListPageState extends State<EventListPage> {
               context,
               MaterialPageRoute(builder: (context) => EventListPage()),
             );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HEPProfilePage()),
-            );
           }
         },
         items: [
@@ -177,10 +178,6 @@ class _EventListPageState extends State<EventListPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.center_focus_strong),
             label: 'Status',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
           ),
         ],
       ),

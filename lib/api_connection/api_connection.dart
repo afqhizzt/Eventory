@@ -1,5 +1,5 @@
 class API {
-  static const hostConnect = "http://10.205.100.38/api_eventory";
+  static const hostConnect = "http://10.205.97.97/api_eventory";
   static const hostConnectStudents = "$hostConnect/students";
 
   //student
@@ -18,7 +18,6 @@ class API {
   static const getPostCount = "$hostConnect/students/getPostsCount.php";
   static const feedback = "$hostConnect/students/save_feedback.php";
 
-
   //club
   static const signUpClub = "$hostConnect/clubs/signup.php";
   static const validateEmailClub = "$hostConnect/clubs/validate_email.php";
@@ -34,4 +33,5 @@ class API {
   static const eventStatus = "$hostConnect/hep/event_status.php";
   static const eventList = "$hostConnect/hep/event_list.php";
   static const getId = "$hostConnect/hep/get_id.php";
+  static const displayEvents = "$hostConnect/hep/display_events.php";
 }
