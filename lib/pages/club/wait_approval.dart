@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'club_profile.dart';
+import 'club_homepage.dart';
 
 class WaitApprovalPage extends StatelessWidget {
   @override
@@ -101,7 +101,7 @@ class WaitApprovalPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ClubProfilePage(),
+                            builder: (context) => ClubHomePage(),
                           ),
                         );
                       },

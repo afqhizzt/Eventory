@@ -11,6 +11,8 @@ import 'dart:convert';
 import 'hep_preferences.dart';
 //import 'hep_homepage.dart';
 import 'EventList.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'google_login_success.dart';
 
 class HEPLoginPage extends StatefulWidget {
   const HEPLoginPage({Key? key}) : super(key: key);
@@ -20,112 +22,32 @@ class HEPLoginPage extends StatefulWidget {
 }
 
 class _HEPLoginPageState extends State<HEPLoginPage> {
-  /*bool _isLoading = false;
-  bool _redirecting = false;
-  late final TextEditingController _emailController = TextEditingController();
-  late final TextEditingController _passwordController =
-      TextEditingController();
-  late final StreamSubscription<AuthState> _authStateSubscription;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-  Future<void> _signIn() async {
+  Future<void> signInWithGoogle() async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      // Sign out the current user (if any)
+      await _googleSignIn.signOut();
 
-      // Perform email and password sign-in
-      final response = await supabase.auth.signInWithPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      // Sign in with Google
+      await _googleSignIn.signIn();
 
-      // Check if email/password sign-in was successful
-      /*if (response.error != null) {
-        throw Exception(response.error!.message);
-      }*/
-
-      // Navigate to the student profile page
-      Navigator.of(context).pushReplacementNamed('/sProfile');
+      // Get the signed-in user
+      GoogleSignInAccount? googleSignInAccount = _googleSignIn.currentUser;
+      if (googleSignInAccount != null) {
+        print("Google Sign-In Successful: ${googleSignInAccount.displayName}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(user: googleSignInAccount),
+          ),
+        );
+        // Perform necessary actions, e.g., navigate to the next screen
+      }
     } catch (error) {
-      // Handle unexpected errors...
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      print("Error signing in with Google: $error");
     }
   }
-
-  Future<AuthResponse> _googleSignIn() async {
-    /// TODO: update the Web client ID with your own.
-    ///
-    /// Web Client ID that you registered with Google Cloud.
-    const webClientId =
-        '526852209261-qn79j9kcm5kk0bqrqsj8l5j6bulpetjt.apps.googleusercontent.com';
-
-    /// TODO: update the iOS client ID with your own.
-    ///
-    /// iOS Client ID that you registered with Google Cloud.
-    //const iosClientId = 'my-ios.apps.googleusercontent.com';
-
-    // Google sign in on Android will work without providing the Android
-    // Client ID registered on Google Cloud.
-
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      //clientId: iosClientId,
-      serverClientId: webClientId,
-    );
-    final googleUser = await googleSignIn.signIn();
-    final googleAuth = await googleUser!.authentication;
-    final accessToken = googleAuth.accessToken;
-    final idToken = googleAuth.idToken;
-
-    if (accessToken == null) {
-      throw 'No Access Token found.';
-    }
-    if (idToken == null) {
-      throw 'No ID Token found.';
-    }
-
-    return supabase.auth.signInWithIdToken(
-      provider: Provider.google,
-      idToken: idToken,
-      accessToken: accessToken,
-    );
-  }
-
-  @override
-  void initState() {
-    _authStateSubscription =
-        supabase.auth.onAuthStateChange.listen((data) async {
-      if (_redirecting) return;
-      final session = data.session;
-      if (session != null) {
-        _redirecting = true;
-
-        // You might want to perform additional actions upon successful authentication
-        // For example, fetching user data, updating UI, etc.
-
-        // Navigator.of(context).pushReplacementNamed('/sProfile');
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _authStateSubscription.cancel();
-    super.dispose();
-  }*/
 
   var formKey = GlobalKey<FormState>();
   var emailController = TextEditingController();
@@ -293,16 +215,14 @@ class _HEPLoginPageState extends State<HEPLoginPage> {
                           ),
                           SizedBox(height: 10),
                           ElevatedButton(
-                            onPressed: () {
-                              /*if (formKey.currentState!.validate()) {
-                                loginUserNow();
-                              }*/
-                              Navigator.push(
+                            onPressed: () async {
+                              await signInWithGoogle();
+                              /*Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EventListPage(),
+                                  builder: (context) => HomePage(),
                                 ),
-                              );
+                              );*/
                             },
                             style: ButtonStyle(
                               backgroundColor:

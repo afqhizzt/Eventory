@@ -130,7 +130,7 @@ class ViewEventPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${eventDetails['eventDetails']['status']}',
+                      '${eventDetails['eventDetails']['approval'] ?? "In Process"}',
                     ),
                     SizedBox(height: 25),
                     Container(
