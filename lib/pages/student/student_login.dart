@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'student_preferences.dart';
 import 'student_homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'google_login_succes.dart';
 
 class StudentLoginPage extends StatefulWidget {
   const StudentLoginPage({Key? key}) : super(key: key);
@@ -20,153 +21,32 @@ class StudentLoginPage extends StatefulWidget {
   _StudentLoginPageState createState() => _StudentLoginPageState();
 }
 
-class GoogleSignInProvider extends ChangeNotifier {
-  final googleSignIn = GoogleSignIn();
-  GoogleSignInAccount? _user;
-  GoogleSignInAccount get user => _user!;
-
-  Future googleLogin() async {
-    final googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return;
-    _user = googleUser;
-
-    final googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    await FirebaseAuth.instance.signInWithCredential(credential);
-
-    notifyListeners();
-  }
-}
-
 class _StudentLoginPageState extends State<StudentLoginPage> {
-  /*bool _isLoading = false;
-  bool _redirecting = false;
-  late final TextEditingController _emailController = TextEditingController();
-  late final TextEditingController _passwordController =
-      TextEditingController();
-  late final StreamSubscription<AuthState> _authStateSubscription;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-  Future<void> _signIn() async {
+  Future<void> signInWithGoogle() async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      // Sign out the current user (if any)
+      await _googleSignIn.signOut();
 
-      // Perform email and password sign-in
-      final response = await supabase.auth.signInWithPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      // Sign in with Google
+      await _googleSignIn.signIn();
 
-      // Check if email/password sign-in was successful
-      /*if (response.error != null) {
-        throw Exception(response.error!.message);
-      }*/
-
-      // Navigate to the student profile page
-      Navigator.of(context).pushReplacementNamed('/sProfile');
+      // Get the signed-in user
+      GoogleSignInAccount? googleSignInAccount = _googleSignIn.currentUser;
+      if (googleSignInAccount != null) {
+        print("Google Sign-In Successful: ${googleSignInAccount.displayName}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(user: googleSignInAccount),
+          ),
+        );
+        // Perform necessary actions, e.g., navigate to the next screen
+      }
     } catch (error) {
-      // Handle unexpected errors...
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      print("Error signing in with Google: $error");
     }
-  }
-
-  Future<AuthResponse> _googleSignIn() async {
-    /// TODO: update the Web client ID with your own.
-    ///
-    /// Web Client ID that you registered with Google Cloud.
-    const webClientId =
-        '526852209261-qn79j9kcm5kk0bqrqsj8l5j6bulpetjt.apps.googleusercontent.com';
-
-    /// TODO: update the iOS client ID with your own.
-    ///
-    /// iOS Client ID that you registered with Google Cloud.
-    //const iosClientId = 'my-ios.apps.googleusercontent.com';
-
-    // Google sign in on Android will work without providing the Android
-    // Client ID registered on Google Cloud.
-
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      //clientId: iosClientId,
-      serverClientId: webClientId,
-    );
-    final googleUser = await googleSignIn.signIn();
-    final googleAuth = await googleUser!.authentication;
-    final accessToken = googleAuth.accessToken;
-    final idToken = googleAuth.idToken;
-
-    if (accessToken == null) {
-      throw 'No Access Token found.';
-    }
-    if (idToken == null) {
-      throw 'No ID Token found.';
-    }
-
-    return supabase.auth.signInWithIdToken(
-      provider: Provider.google,
-      idToken: idToken,
-      accessToken: accessToken,
-    );
-  }
-
-  @override
-  void initState() {
-    _authStateSubscription =
-        supabase.auth.onAuthStateChange.listen((data) async {
-      if (_redirecting) return;
-      final session = data.session;
-      if (session != null) {
-        _redirecting = true;
-
-        // You might want to perform additional actions upon successful authentication
-        // For example, fetching user data, updating UI, etc.
-
-        // Navigator.of(context).pushReplacementNamed('/sProfile');
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _authStateSubscription.cancel();
-    super.dispose();
-  }*/
-
-  GoogleSignInProvider _googleSignInProvider = GoogleSignInProvider();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _googleSignInProvider.addListener(() {
-      // This will be called whenever the GoogleSignInProvider is updated.
-      // You can perform actions based on the sign-in state here.
-      if (_googleSignInProvider.user != null) {
-        // User signed in, perform necessary actions
-        print(
-            "Google Sign-In Successful: ${_googleSignInProvider.user.displayName}");
-        // You can navigate to the next screen or perform other actions here
-      }
-    });
   }
 
   var formKey = GlobalKey<FormState>();
@@ -336,7 +216,13 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () async {
-                              await _googleSignInProvider.googleLogin();
+                              await signInWithGoogle();
+                              /*Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(),
+                                ),
+                              );*/
                             },
                             style: ButtonStyle(
                               backgroundColor:
