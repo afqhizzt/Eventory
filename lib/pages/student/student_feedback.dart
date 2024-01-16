@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tryyy/pages/club/reminder.dart';
 import '../../api_connection/api_connection.dart';
 
 void main() {
@@ -29,10 +30,10 @@ class EventoryHomePage extends StatelessWidget {
         title: Text(
           'Eventory',
           style: TextStyle(
-            color: Colors.white, // Text color of the app name
+            color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.black, // Background color of the app name
+        backgroundColor: Colors.black,
       ),
       body: FeedbackAndReviews(),
     );
@@ -49,14 +50,6 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
   TextEditingController emailController = TextEditingController();
   TextEditingController feedbackController = TextEditingController();
 
-  int _starRating = 0;
-
-  void _setRating(int rating) {
-    setState(() {
-      _starRating = rating;
-    });
-  }
-
   Future<void> sendFeedback(String name, String email, String feedback) async {
     final response = await http.post(
       Uri.parse(API.feedback), // Replace with your server URL
@@ -70,7 +63,7 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['status'] == 'success') {
-        print('Feedback submitted successfully');
+        _showSuccessDialog(); // Show success dialog if feedback is submitted successfully
       } else {
         print('Error submitting feedback: ${responseData['message']}');
       }
@@ -78,6 +71,30 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
       print('HTTP request error: ${response.statusCode}');
     }
   }
+
+ void _showSuccessDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Successful Submit'),
+        content: Text('Feedback submitted successfully'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage() // Navigate back to HomePage
+              ));
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -98,30 +115,6 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              'Rate this app:',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                for (int i = 1; i <= 5; i++)
-                  IconButton(
-                    onPressed: () {
-                      _setRating(i);
-                    },
-                    icon: Icon(
-                      i <= _starRating ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(height: 20.0),
             Text(
               'Your Feedback:',
               style: TextStyle(
@@ -175,7 +168,8 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
               child: Text(
                 'Submit',
                 style: TextStyle(
-                    color: Colors.white), // Change text color to white
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
