@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../api_connection/api_connection.dart';
 
 void main() {
   runApp(EventoryApp());
@@ -42,6 +45,10 @@ class FeedbackAndReviews extends StatefulWidget {
 }
 
 class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController feedbackController = TextEditingController();
+
   int _starRating = 0;
 
   void _setRating(int rating) {
@@ -50,97 +57,129 @@ class _FeedbackAndReviewsState extends State<FeedbackAndReviews> {
     });
   }
 
+  Future<void> sendFeedback(String name, String email, String feedback) async {
+    final response = await http.post(
+      Uri.parse(API.feedback), // Replace with your server URL
+      body: {
+        'name': name,
+        'email': email,
+        'feedback': feedback,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['status'] == 'success') {
+        print('Feedback submitted successfully');
+      } else {
+        print('Error submitting feedback: ${responseData['message']}');
+      }
+    } else {
+      print('HTTP request error: ${response.statusCode}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Feedback and Reviews',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Feedback and Reviews',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
           ),
-          SizedBox(height: 20.0),
-          Text(
-            'Rate this app:',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
+        ),
+      ),
+      body: Container(
+        color: Colors.black,
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Rate this app:',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18.0,
+              ),
             ),
-          ),
-          SizedBox(height: 10.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              for (int i = 1; i <= 5; i++)
-                IconButton(
-                  onPressed: () {
-                    _setRating(i);
-                  },
-                  icon: Icon(
-                    i <= _starRating ? Icons.star : Icons.star_border,
-                    color: Colors.yellow,
+            SizedBox(height: 10.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                for (int i = 1; i <= 5; i++)
+                  IconButton(
+                    onPressed: () {
+                      _setRating(i);
+                    },
+                    icon: Icon(
+                      i <= _starRating ? Icons.star : Icons.star_border,
+                      color: Colors.yellow,
+                    ),
                   ),
-                ),
-            ],
-          ),
-          SizedBox(height: 20.0),
-          Text(
-            'Your Feedback:',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
+              ],
             ),
-          ),
-          SizedBox(height: 10.0),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Name',
-              labelStyle: TextStyle(color: Colors.white),
-              border: OutlineInputBorder(),
+            SizedBox(height: 20.0),
+            Text(
+              'Your Feedback:',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18.0,
+              ),
             ),
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(height: 10.0),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Email',
-              labelStyle: TextStyle(color: Colors.white),
-              border: OutlineInputBorder(),
+            SizedBox(height: 10.0),
+            TextFormField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                labelStyle: TextStyle(color: Colors.white),
+                border: OutlineInputBorder(),
+              ),
+              style: TextStyle(color: Colors.white),
             ),
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(height: 10.0),
-          TextFormField(
-            maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'Feedback',
-              labelStyle: TextStyle(color: Colors.white),
-              border: OutlineInputBorder(),
+            SizedBox(height: 10.0),
+            TextFormField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                labelStyle: TextStyle(color: Colors.white),
+                border: OutlineInputBorder(),
+              ),
+              style: TextStyle(color: Colors.white),
             ),
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(height: 10.0),
-          ElevatedButton(
-            onPressed: () {
-              // Implement functionality to handle feedback submission
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.red, // Change button color to red
+            SizedBox(height: 10.0),
+            TextFormField(
+              controller: feedbackController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Feedback',
+                labelStyle: TextStyle(color: Colors.white),
+                border: OutlineInputBorder(),
+              ),
+              style: TextStyle(color: Colors.white),
             ),
-            child: Text(
-              'Submit',
-              style:
-                  TextStyle(color: Colors.white), // Change text color to white
+            SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                sendFeedback(
+                  nameController.text,
+                  emailController.text,
+                  feedbackController.text,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.red, // Change button color to red
+              ),
+              child: Text(
+                'Submit',
+                style: TextStyle(
+                    color: Colors.white), // Change text color to white
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
