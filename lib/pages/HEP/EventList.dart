@@ -129,6 +129,17 @@ class _EventListPageState extends State<EventListPage> {
             style: TextStyle(fontSize: 20.0), // Adjust the font size if needed
           ),
         ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.logout,
+            color: const Color.fromARGB(255, 0, 0, 0),
+          ), // Use the appropriate logout icon
+          onPressed: () {
+            // Implement your logout logic here
+            // For example, you can navigate to the login screen
+            Navigator.pushReplacementNamed(context, '/hLogin');
+          },
+        ),
       ),
       backgroundColor: Color.fromARGB(255, 33, 33, 33),
       body: Column(

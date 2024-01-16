@@ -12,7 +12,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Function to navigate to HomePage after a delay
     void navigateToHomePage() {
-      Future.delayed(Duration(seconds: 10), () {
+      Future.delayed(Duration(seconds: 5), () {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

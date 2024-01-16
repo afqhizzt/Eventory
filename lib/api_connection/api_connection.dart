@@ -8,9 +8,9 @@ class API {
   static const login = "$hostConnect/students/login.php";
   static const post = "$hostConnect/students/post.php";
   static const registerEvent = "$hostConnect/students/register_event.php";
-  static const studentEditInfoPage =
+  static const StudentEditInfoPage =
       "$hostConnect/students/studentEditInfoPage.php";
-  static const activities = "$hostConnect/students/activities.php";
+  static const activities = "$hostConnect/students/add_activities.php";
   static const getFollowersCount =
       "$hostConnect/students/getFollowersCount.php";
   static const getFollowingCount =
@@ -25,6 +25,7 @@ class API {
   static const events = "$hostConnect/clubs/events.php";
   static const createPost = "$hostConnect/clubs/create_post.php";
   static const eventDetail = "$hostConnect/clubs/event_details.php";
+  static const clubEditInfoPage = "$hostConnect/clubs/ClubEditInfoPage.php";
 
   //HEP
   static const signUpHEP = "$hostConnect/hep/signup.php";

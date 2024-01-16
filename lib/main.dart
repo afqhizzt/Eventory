@@ -6,7 +6,9 @@ import 'pages/hello_flutter.dart';
 import 'pages/student/student_registration.dart';
 import 'pages/club/club_registration.dart';
 import 'pages/HEP/hep_registration.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'pages/student/student_login.dart';
+import 'pages/club/club_login.dart';
+import 'pages/HEP/HEP_login.dart';
 
 Future main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,9 @@ class MyApp extends StatelessWidget {
         '/sProfile': (_) => StudentProfilePage(),
         '/cProfile': (_) => ClubProfilePage(),
         '/hProfile': (_) => HEPProfilePage(),
+        '/sLogin': (_) => StudentLoginPage(),
+        '/cLogin': (_) => ClubLoginPage(),
+        '/hLogin': (_) => HEPLoginPage(),
       },
     );
   }

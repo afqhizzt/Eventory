@@ -7,7 +7,7 @@ import 'search.dart';
 import 'reminder.dart';
 import 'add_post_screen.dart';
 import 'student_feedback.dart';
-import '../../api_connection/api_connection.dart' as apiConnection;
+import '../../api_connection/api_connection.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,10 +30,10 @@ class StudentProfilePage extends StatefulWidget {
 
 class _StudentProfilePageState extends State<StudentProfilePage> {
   // Placeholder values, replace them with actual data from your server
-  String userName = 'LEE MIN HO';
+  String userName = 'AFIQAH IZZATI';
   String collegeInfo = 'Kolej Tun Dr Ismail , UTM';
   String bio = '"Enthusiast for events"';
-  String profileImage = 'images/spon.webp';
+  String profileImage = 'images/afiqah.jpg';
 
   int followersCount = 0;
   int followingCount = 0;
@@ -61,7 +61,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     try {
       // Fetch Followers Count
       final followersResponse = await http.post(
-        Uri.parse(apiConnection.API.getFollowersCount),
+        Uri.parse(API.getFollowersCount),
         body: {'user_id': userId.toString()},
       );
       setState(() {
@@ -70,7 +70,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
 
       // Fetch Following Count
       final followingResponse = await http.post(
-        Uri.parse(apiConnection.API.getFollowingCount),
+        Uri.parse(API.getFollowingCount),
         body: {'user_id': userId.toString()},
       );
       setState(() {
@@ -79,7 +79,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
 
       // Fetch Post Count
       final postResponse = await http.post(
-        Uri.parse(apiConnection.API.getPostCount),
+        Uri.parse(API.getPostCount),
         body: {'user_id': userId.toString()},
       );
       setState(() {
@@ -140,7 +140,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
   Future<void> addActivities(int leadership, int career, int award,
       int cultural, int academic, int volunteer) async {
     final response = await http.post(
-      Uri.parse('http://10.205.101.192/api_eventory/add_activities.php'),
+      Uri.parse(API.activities),
       body: {
         'leadership': leadership.toString(),
         'career': career.toString(),
@@ -306,17 +306,29 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                         color: Colors.grey,
                         thickness: 0.5,
                       ),
-                      Container(
-                        color: Colors.black,
-                        height: 15, // Adjust the height of the black bar
-                      ),
-                      SizedBox(height: 16),
                     ],
                   ),
                 ),
-                _buildActivitiesList(activities),
-                SizedBox(height: 20),
+
+                Container(
+                  color: Colors.black,
+                  height: 15, // Adjust the height of the black bar
+                ),
+                SizedBox(height: 16),
+
+                SizedBox(height: 5),
+                Text(
+                  "    Acummulated Merit Activities",
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 15),
                 _buildPieChart(activities),
+
+                SizedBox(height: 20),
+                _buildActivitiesList(activities),
                 SizedBox(height: 20),
                 Center(
                   child: Text(
@@ -414,15 +426,20 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 18, color: Colors.grey),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
           ),
-          Text(
-            count.toString(),
-            style: TextStyle(fontSize: 18, color: Colors.grey),
+          Expanded(
+            child: Text(
+              count.toString(),
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
           ),
         ],
       ),

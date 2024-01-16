@@ -68,6 +68,17 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: Icon(
+            Icons.logout,
+            color: Colors.white,
+          ), // Use the appropriate logout icon
+          onPressed: () {
+            // Implement your logout logic here
+            // For example, you can navigate to the login screen
+            Navigator.pushReplacementNamed(context, '/sLogin');
+          },
+        ),
       ),
       backgroundColor: Colors.black,
       body: ListView.builder(
