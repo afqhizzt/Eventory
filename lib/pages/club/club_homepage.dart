@@ -8,11 +8,13 @@ import 'post_events.dart';
 import 'event_details.dart';
 
 class Post {
+  final String id;
   final String username;
   final String imageUrl;
-  final String caption;
+  String caption; // Make caption mutable for editing
 
   Post({
+    required this.id,
     required this.username,
     required this.imageUrl,
     required this.caption,
@@ -20,6 +22,7 @@ class Post {
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
+      id: json['id'],
       username: json['username'],
       imageUrl: json['imageUrl'], // Adjust the base URL
       caption: json['caption'],
@@ -71,10 +74,8 @@ class _HomePageState extends State<ClubHomePage> {
           icon: Icon(
             Icons.logout,
             color: Colors.white,
-          ), // Use the appropriate logout icon
+          ),
           onPressed: () {
-            // Implement your logout logic here
-            // For example, you can navigate to the login screen
             Navigator.pushReplacementNamed(context, '/cLogin');
           },
         ),
@@ -83,7 +84,6 @@ class _HomePageState extends State<ClubHomePage> {
             icon: Icon(Icons.add_circle),
             color: Colors.white,
             onPressed: () {
-              // Navigate to the page for creating a new post
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NewPostPage()),
@@ -164,16 +164,35 @@ class _HomePageState extends State<ClubHomePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CircleAvatar(
-                  radius: 20.0,
-                  backgroundImage: AssetImage(
-                    'images/persaka.jpg',
-                  ),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20.0,
+                      backgroundImage: AssetImage('images/persaka.jpg'),
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(post.username,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
                 ),
-                SizedBox(width: 8.0),
-                Text(post.username,
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        showEditCaptionDialog(context, post);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        showDeleteConfirmationDialog(context, post);
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -190,5 +209,128 @@ class _HomePageState extends State<ClubHomePage> {
         ],
       ),
     );
+  }
+
+  void showDeleteConfirmationDialog(BuildContext context, Post post) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Post"),
+          content: Text("Are you sure you want to delete this post?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                deletePost(post);
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deletePost(Post post) async {
+    try {
+      final response = await http.post(
+        Uri.parse(API.deletePost),
+        body: {'id': post.id?.toString() ?? ''},
+      );
+
+      print('Server Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['success']) {
+          setState(() {
+            posts.remove(post);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message']),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message']),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting post. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error deleting post: $error');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('An unexpected error occurred. Please try again later.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void showEditCaptionDialog(BuildContext context, Post post) {
+    String newCaption = post.caption;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Edit Caption"),
+          content: TextField(
+            onChanged: (value) {
+              newCaption = value;
+            },
+            controller: TextEditingController(text: post.caption),
+            decoration: InputDecoration(labelText: 'New Caption'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                editCaption(post, newCaption);
+              },
+              child: Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void editCaption(Post post, String newCaption) {
+    setState(() {
+      post.caption = newCaption;
+    });
+
+    // Implement your logic to update the caption, e.g., make an API call
+    // You can use a similar approach to the delete logic
   }
 }

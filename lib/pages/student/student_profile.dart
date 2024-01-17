@@ -261,47 +261,6 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                           color: Colors.grey,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  'Posts',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('$postCount'),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  'Followers',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('$followersCount'),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  'Following',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('$followingCount'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
                       Divider(
                         color: Colors.grey,
                         thickness: 0.5,
@@ -495,7 +454,7 @@ class PieChartPainter extends CustomPainter {
         text: TextSpan(
           text: category,
           style: TextStyle(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 28, 28, 28),
             fontSize: 14,
           ),
         ),
