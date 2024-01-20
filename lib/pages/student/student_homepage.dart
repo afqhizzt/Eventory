@@ -7,6 +7,10 @@ import 'student_profile.dart';
 import 'reminder.dart';
 import '../../api_connection/api_connection.dart';
 import 'joint_event.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'dart:async';
+
+BuildContext? _storedContext;
 
 class Post {
   final String username;
@@ -57,6 +61,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _storedContext = context;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -202,8 +207,66 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-void showRegistrationForm(BuildContext context) {
-  showDialog(
+class PaymentFailureResponse {
+  final String code;
+  final String message;
+  final String source;
+
+  PaymentFailureResponse({
+    required this.code,
+    required this.message,
+    required this.source,
+  });
+
+  factory PaymentFailureResponse.fromMap(Map<dynamic, dynamic>? map) {
+    if (map == null) {
+      // Handle the case where the map is null
+      throw Exception("Null map received for PaymentFailureResponse");
+    }
+    return PaymentFailureResponse(
+      code: map['code'].toString(),
+      message: map['message'].toString(),
+      source: map['source'].toString(),
+    );
+  }
+}
+
+void payment(BuildContext context) {
+  var options = {
+    'key': 'rzp_test_PvugleDn28EeSP',
+    'amount': 500,
+    'order': {
+      'id': '1',
+      'entity': "order",
+      'amount': 500,
+      'amount_paid': 0,
+      'amount_due': 0,
+      'currency': 'MYR',
+      'receipt': 'rcptid_11',
+      'status': 'created',
+    },
+    'name': 'Eventory',
+    'description': 'Fees',
+    'timeout': 120,
+    'prefill': {
+      'contact': '0189114102',
+      'email': 'afiqah.izzati@graduate.utm.my',
+    },
+    'currency': 'MYR',
+  };
+  var _razorpay = Razorpay();
+  try {
+    _razorpay.open(options);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  } catch (e) {
+    // Handle exceptions if any
+  }
+}
+
+void showRegistrationForm(BuildContext context) async {
+  bool? paymentRequired = await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -214,4 +277,65 @@ void showRegistrationForm(BuildContext context) {
       );
     },
   );
+
+  if (paymentRequired == true) {
+    print('Calling payment() after dialog is closed.');
+    payment(context); // Pass the context to the payment function
+  } else {
+    print('Payment not required or user closed the dialog.');
+  }
+}
+
+void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  if (_storedContext != null) {
+    showDialog(
+      context: _storedContext!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Successful'),
+          content: Text('You have successfully registered for this event.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // You can also perform other actions here based on the successful payment
+  // For example, navigate to a different screen, update the UI, etc.
+}
+
+void _handlePaymentError(dynamic response) {
+  if (response is PaymentFailureResponse) {
+    print('Payment failed: ${response.message}');
+    print('Error Code: ${response.code}');
+    // print('Error Source: ${response.source}');
+    // You can log additional details as needed
+
+    // You can show an error dialog or take appropriate action here
+    // Optionally, navigate back to the homepage
+    // Navigator.of(context).pop();
+  } else if (response is String) {
+    // Handle the case where the response is a String (possibly an error message)
+    print('Payment failed with error: $response');
+    // You can show an error dialog or take appropriate action here
+    // Optionally, navigate back to the homepage
+    //Navigator.of(context).pop();
+  } else {
+    // Handle other unexpected types
+    print('Unexpected payment response type: ${response.runtimeType}');
+    // You can show an error dialog or take appropriate action here
+    // Optionally, navigate back to the homepage
+    // Navigator.of(context).pop();
+  }
+}
+
+void _handleExternalWallet(ExternalWalletResponse response) {
+  // Do something when an external wallet is selected
 }

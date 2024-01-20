@@ -11,8 +11,18 @@ class JoinEventPage extends StatelessWidget {
   TextEditingController icNumberController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
 
+  bool paymentRequired = false;
+
+  bool isPaymentRequired() {
+    // Determine whether payment is required based on your logic.
+    // For example, you can check some conditions or user inputs.
+    // Return true if payment is required, false otherwise.
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    paymentRequired = isPaymentRequired();
     return Scaffold(
       backgroundColor: Colors.black,
       body: BackdropFilter(
@@ -132,35 +142,39 @@ class JoinEventPage extends StatelessWidget {
 
                             if (response.statusCode == 200) {
                               // Registration successful
-                              // Show success dialog
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Row(
-                                      children: [
-                                        Icon(Icons.done, color: Colors.green),
-                                        SizedBox(width: 8.0),
-                                        Text('Success'),
-                                      ],
-                                    ),
-                                    content: Text(
-                                        'You have successfully registered!'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          // Close the dialog
-                                          Navigator.of(context).pop();
 
-                                          // Go back to the homepage
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('OK'),
+                              // Decide whether payment is required
+                              if (paymentRequired) {
+                                // Close the dialog and set paymentRequired to true
+                                Navigator.of(context).pop(true);
+                              } else {
+                                // Show success dialog
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Row(
+                                        children: [
+                                          Icon(Icons.done, color: Colors.green),
+                                          SizedBox(width: 8.0),
+                                          Text('Success'),
+                                        ],
                                       ),
-                                    ],
-                                  );
-                                },
-                              );
+                                      content: Text(
+                                          'You have successfully registered!'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            // Close the dialog when "OK" is pressed
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('OK'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
                             } else {
                               // Registration failed
                               // Show failure dialog
